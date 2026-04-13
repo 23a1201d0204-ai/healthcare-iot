@@ -3,32 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Theo Dõi Y Tế Chuyên Sâu - Neon Edition</title>
+    <title>Hệ Thống Theo Dõi Y Tế Chuyên Sâu - Premium Neon</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        /* BẢNG MÀU DARK NEON (Tinh tế, không chói) */
+        /* BẢNG MÀU DARK NEON */
         :root { 
-            --bg-body: #0a0a0f;        /* Đen tuyền ánh xanh */
-            --bg-sidebar: #12121a;     /* Đen xám */
-            --bg-card: #151520;        /* Nền thẻ */
-            --text-primary: #f8fafc;   /* Trắng sáng */
-            --text-secondary: #94a3b8; /* Xám dịu */
-            --border-color: #2a2a35;   /* Viền mỏng */
+            --bg-body: #08080c;        
+            --bg-sidebar: #101016;     
+            --bg-card: #14141d;        
+            --text-primary: #f8fafc;   
+            --text-secondary: #8b9bb4; 
+            --border-color: #232332;   
             
-            /* Màu Neon */
-            --neon-hr: #ff2a5f;        /* Đỏ hồng neon */
-            --neon-spo2: #00e5ff;      /* Xanh cyan neon */
-            --neon-success: #00ff88;   /* Xanh lá neon */
-            --neon-warning: #ffb703;   /* Vàng neon */
+            --neon-hr: #ff2a5f;        
+            --neon-spo2: #00e5ff;      
+            --neon-success: #00ff88;   
+            --neon-warning: #ffb703;   
+            --neon-purple: #9d4edd;
             
-            /* Hiệu ứng Glow mượt (Soft Glow) */
-            --glow-hr: 0 0 15px rgba(255, 42, 95, 0.3);
-            --glow-spo2: 0 0 15px rgba(0, 229, 255, 0.3);
-            --glow-success: 0 0 15px rgba(0, 255, 136, 0.2);
+            --glow-hr: 0 0 20px rgba(255, 42, 95, 0.4);
+            --glow-spo2: 0 0 20px rgba(0, 229, 255, 0.4);
+            --glow-success: 0 0 20px rgba(0, 255, 136, 0.3);
+            
+            /* Đường cong chuyển động cực mượt */
+            --smooth-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         body { 
@@ -37,103 +39,137 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             overflow-x: hidden; 
             margin: 0; padding: 0;
+            scroll-behavior: smooth;
         }
 
         /* KHUNG ĐĂNG NHẬP */
-        #login-overlay { position: fixed; inset: 0; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 0.4s; }
-        .login-card { background: var(--bg-card); padding: 40px; border-radius: 20px; border: 1px solid rgba(0, 229, 255, 0.2); box-shadow: var(--glow-spo2); width: 400px; text-align: center; }
-        .login-card input { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.1rem; padding: 12px; border-radius: 10px; }
-        .login-card input:focus { background: rgba(0, 229, 255, 0.05); border-color: var(--neon-spo2); color: white; box-shadow: 0 0 8px rgba(0, 229, 255, 0.3); outline: none;}
-        .btn-medical { background: linear-gradient(45deg, #0088cc, var(--neon-spo2)); color: #000; font-weight: bold; border: none; border-radius: 10px; transition: 0.3s; box-shadow: var(--glow-spo2); }
-        .btn-medical:hover { filter: brightness(1.2); transform: translateY(-2px); color: #000; }
+        #login-overlay { position: fixed; inset: 0; background: rgba(8, 8, 12, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s var(--smooth-ease), visibility 0.6s; }
+        .login-card { background: var(--bg-card); padding: 40px; border-radius: 20px; border: 1px solid rgba(0, 229, 255, 0.2); box-shadow: var(--glow-spo2); width: 400px; text-align: center; transform: translateY(0); transition: 0.4s var(--smooth-ease); }
+        .login-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 229, 255, 0.3); }
+        .login-card input { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.1rem; padding: 14px; border-radius: 12px; transition: 0.3s; }
+        .login-card input:focus { background: rgba(0, 229, 255, 0.05); border-color: var(--neon-spo2); color: white; box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1), 0 0 15px rgba(0, 229, 255, 0.3); outline: none;}
+        .btn-medical { background: linear-gradient(135deg, #0088cc, var(--neon-spo2)); color: #000; font-weight: 800; border: none; border-radius: 12px; transition: all 0.4s var(--smooth-ease); box-shadow: var(--glow-spo2); overflow: hidden; position: relative;}
+        .btn-medical::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.5s; }
+        .btn-medical:hover::after { left: 100%; }
+        .btn-medical:hover { filter: brightness(1.2); transform: translateY(-3px) scale(1.02); color: #000; box-shadow: 0 10px 25px rgba(0, 229, 255, 0.6); }
 
         /* BỐ CỤC & SIDEBAR ĐÓNG MỞ */
-        .sidebar { background: var(--bg-sidebar); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; transition: width 0.3s ease; z-index: 1000; }
-        .sidebar.collapsed { width: 80px; } /* Thu gọn */
-        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text { display: none; }
+        .sidebar { background: rgba(16, 16, 22, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; transition: width 0.4s var(--smooth-ease); z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+        .sidebar.collapsed { width: 85px; } 
+        .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text { opacity: 0; pointer-events: none; display: none; }
         
         .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;}
-        .toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.2s; }
-        .toggle-btn:hover { color: var(--neon-spo2); text-shadow: var(--glow-spo2); }
+        .toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
+        .toggle-btn:hover { color: var(--neon-spo2); text-shadow: var(--glow-spo2); transform: scale(1.1); }
         
-        .nav-link { color: var(--text-secondary); padding: 16px 20px; font-size: 1.05rem; border-left: 4px solid transparent; transition: all 0.3s ease; cursor: pointer; display: flex; align-items: center; white-space: nowrap;}
-        .nav-link:hover { background: rgba(0, 229, 255, 0.05); color: var(--text-primary); }
-        .nav-link.active { background: rgba(0, 229, 255, 0.1); color: var(--neon-spo2); border-left-color: var(--neon-spo2); font-weight: bold; text-shadow: 0 0 5px rgba(0, 229, 255, 0.5); }
-        .nav-icon { width: 35px; text-align: center; margin-right: 10px; font-size: 1.2rem; }
+        /* HIỆU ỨNG NAV LINK CỰC ĐẸP */
+        .nav-link { color: var(--text-secondary); padding: 18px 20px; font-size: 1.05rem; border-left: 4px solid transparent; transition: all 0.4s var(--smooth-ease); cursor: pointer; display: flex; align-items: center; white-space: nowrap; position: relative; overflow: hidden; z-index: 1;}
+        .nav-link::before { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 0; background: linear-gradient(90deg, rgba(0, 229, 255, 0.1) 0%, transparent 100%); z-index: -1; transition: width 0.5s var(--smooth-ease); }
+        .nav-link:hover::before { width: 100%; }
+        .nav-link:hover { color: var(--text-primary); transform: translateX(5px); }
+        .nav-link.active::before { width: 100%; background: linear-gradient(90deg, rgba(0, 229, 255, 0.15) 0%, transparent 100%); }
+        .nav-link.active { color: var(--neon-spo2); border-left-color: var(--neon-spo2); font-weight: 600; text-shadow: 0 0 10px rgba(0, 229, 255, 0.4); background: rgba(0, 229, 255, 0.05); }
         
-        .main-content { margin-left: 280px; padding: 30px; transition: margin-left 0.3s ease; }
-        .main-content.expanded { margin-left: 80px; }
+        /* Hiệu ứng nảy Icon khi Active */
+        .nav-icon { width: 35px; text-align: center; margin-right: 10px; font-size: 1.25rem; transition: transform 0.4s var(--smooth-ease), color 0.3s; }
+        .nav-link:hover .nav-icon { transform: scale(1.1); }
+        .nav-link.active .nav-icon { animation: popIcon 0.5s var(--smooth-ease) forwards; color: var(--neon-spo2); }
+        @keyframes popIcon { 0% { transform: scale(1); } 50% { transform: scale(1.3) translateY(-3px); } 100% { transform: scale(1.1) translateY(0); } }
+
+        .main-content { margin-left: 280px; padding: 35px; transition: margin-left 0.4s var(--smooth-ease); }
+        .main-content.expanded { margin-left: 85px; }
         
-        /* THẺ DỮ LIỆU (CARDS) */
-        .card-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; margin-bottom: 24px; transition: transform 0.3s, box-shadow 0.3s; }
-        .card-stat:hover { border-color: rgba(255, 255, 255, 0.1); }
+        /* THẺ DỮ LIỆU (CARDS) - HOVER NỔI 3D */
+        .card-stat { background: linear-gradient(145deg, var(--bg-card), #181824); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; margin-bottom: 24px; transition: all 0.4s var(--smooth-ease); position: relative; z-index: 1; }
+        .card-stat::after { content: ''; position: absolute; inset: 0; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); opacity: 0; transition: 0.4s var(--smooth-ease); z-index: -1; }
+        .card-stat:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.15); }
+        .card-stat:hover::after { opacity: 1; }
+        
+        /* Glow đặc biệt cho thẻ Nhịp tim và SpO2 khi hover */
+        .card-hr:hover { border-color: rgba(255, 42, 95, 0.3); box-shadow: 0 15px 35px rgba(255, 42, 95, 0.15); }
+        .card-spo2:hover { border-color: rgba(0, 229, 255, 0.3); box-shadow: 0 15px 35px rgba(0, 229, 255, 0.15); }
+
         .card-title-sm { color: var(--text-secondary); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 15px; }
         
         /* CHỈ SỐ VỚI NEON TEXT */
-        .value-display { font-size: 4.5rem; font-weight: 900; line-height: 1; margin: 10px 0; font-family: 'Courier New', Courier, monospace; }
+        .value-display { font-size: 5rem; font-weight: 900; line-height: 1; margin: 10px 0; font-family: 'Courier New', Courier, monospace; letter-spacing: -2px; }
         .val-hr { color: var(--neon-hr); text-shadow: var(--glow-hr); }
         .val-spo2 { color: var(--neon-spo2); text-shadow: var(--glow-spo2); }
-        .value-unit { font-size: 1.5rem; font-weight: normal; color: var(--text-secondary); text-shadow: none; margin-left: 8px; }
+        .value-unit { font-size: 1.5rem; font-weight: normal; color: var(--text-secondary); text-shadow: none; margin-left: 8px; letter-spacing: 0; }
         
         /* BẢNG CHUYÊN NGHIỆP */
-        .table-custom { color: var(--text-primary); width: 100%; margin: 0; }
-        .table-custom th { color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-color); padding: 15px; text-transform: uppercase; font-size: 0.85rem; }
-        .table-custom td { padding: 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 1.05rem; }
-        .table-custom tbody tr:hover { background: rgba(255,255,255,0.02); }
+        .table-custom { color: var(--text-primary); width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
+        .table-custom th { color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-color); padding: 18px 15px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
+        .table-custom td { padding: 18px 15px; border-bottom: 1px solid rgba(255,255,255,0.02); vertical-align: middle; font-size: 1.05rem; transition: background 0.3s; }
+        .table-custom tbody tr:hover td { background: rgba(255,255,255,0.03); }
 
         /* BADGE TRẠNG THÁI */
-        .badge-status { padding: 6px 12px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; letter-spacing: 0.5px; }
-        .bg-normal { background: rgba(0, 255, 136, 0.1); color: var(--neon-success); border: 1px solid rgba(0, 255, 136, 0.3); box-shadow: var(--glow-success); }
-        .bg-alert { background: rgba(255, 42, 95, 0.1); color: var(--neon-hr); border: 1px solid rgba(255, 42, 95, 0.3); box-shadow: var(--glow-hr); }
+        .badge-status { padding: 8px 14px; border-radius: 10px; font-weight: bold; font-size: 0.85rem; letter-spacing: 0.5px; display: inline-flex; align-items: center; }
+        .bg-normal { background: rgba(0, 255, 136, 0.1); color: var(--neon-success); border: 1px solid rgba(0, 255, 136, 0.3); box-shadow: inset 0 0 10px rgba(0,255,136,0.1); }
+        .bg-alert { background: rgba(255, 42, 95, 0.1); color: var(--neon-hr); border: 1px solid rgba(255, 42, 95, 0.3); box-shadow: inset 0 0 10px rgba(255,42,95,0.1); animation: pulseAlert 2s infinite; }
+        @keyframes pulseAlert { 0% { box-shadow: 0 0 0 0 rgba(255,42,95,0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,42,95,0); } 100% { box-shadow: 0 0 0 0 rgba(255,42,95,0); } }
 
-        /* HIỆU ỨNG TAB */
-        .tab-pane { display: none; animation: fadeIn 0.4s ease-out; }
-        .tab-pane.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        /* HIỆU ỨNG CHUYỂN TAB CỰC MƯỢT (BLUR + SCALE) */
+        .tab-pane { display: none; opacity: 0; }
+        .tab-pane.active { 
+            display: block; 
+            animation: cinematicFadeIn 0.6s var(--smooth-ease) forwards; 
+        }
+        @keyframes cinematicFadeIn { 
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(8px); } 
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 
+        }
 
         /* HEADER THÔNG TIN */
-        .patient-header { background: linear-gradient(145deg, var(--bg-card), #1a1a24); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .patient-header { background: linear-gradient(120deg, var(--bg-card), #12121a); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
+        .patient-header::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--neon-spo2); box-shadow: var(--glow-spo2); }
         
-        /* TIM ĐẬP */
-        .heart-beat { animation: pump 0.8s infinite; color: var(--neon-hr); filter: drop-shadow(0 0 8px rgba(255,42,95,0.6)); }
-        @keyframes pump { 0% { transform: scale(1); } 20% { transform: scale(1.2); } 40% { transform: scale(1); } }
+        /* TIM ĐẬP MƯỢT HƠN */
+        .heart-beat { animation: pumpSmooth 1s var(--smooth-ease) infinite; color: var(--neon-hr); filter: drop-shadow(0 0 10px rgba(255,42,95,0.6)); }
+        @keyframes pumpSmooth { 0% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
 
-        /* FORM INPUT NEON STYLE */
-        .form-control-neon { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: white; }
-        .form-control-neon:focus { background: rgba(0,229,255,0.05); border-color: var(--neon-spo2); color: white; box-shadow: var(--glow-spo2); }
+        /* FORM & INPUT */
+        .form-control-neon { background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: white; padding: 12px 15px; border-radius: 10px; transition: all 0.3s var(--smooth-ease); }
+        .form-control-neon:focus { background: rgba(0,229,255,0.03); border-color: var(--neon-spo2); color: white; box-shadow: 0 0 15px rgba(0,229,255,0.2); }
         
         /* ĐÈN CHUẨN ĐOÁN */
-        .diag-box { padding: 20px; border-radius: 12px; margin-top: 15px; display: none; border-left: 5px solid; background: rgba(255,255,255,0.02); }
-        .diag-safe { border-left-color: var(--neon-success); color: var(--neon-success); }
-        .diag-warn { border-left-color: var(--neon-warning); color: var(--neon-warning); }
-        .diag-danger { border-left-color: var(--neon-hr); color: var(--neon-hr); }
+        .diag-box { padding: 25px; border-radius: 15px; margin-top: 20px; display: none; border-left: 6px solid; background: rgba(255,255,255,0.02); backdrop-filter: blur(5px); animation: cinematicFadeIn 0.5s var(--smooth-ease); }
+        .diag-safe { border-left-color: var(--neon-success); box-shadow: -5px 0 20px rgba(0,255,136,0.1); }
+        .diag-warn { border-left-color: var(--neon-warning); box-shadow: -5px 0 20px rgba(255,183,3,0.1); }
+        .diag-danger { border-left-color: var(--neon-hr); box-shadow: -5px 0 20px rgba(255,42,95,0.15); }
+
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-spo2); }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
     <div class="login-card">
-        <i class="fas fa-microchip fa-4x mb-3" style="color: var(--neon-spo2); filter: drop-shadow(0 0 10px rgba(0,229,255,0.5));"></i>
-        <h3 class="fw-bold mb-2 text-white" style="letter-spacing: 1px;">MED<span style="color: var(--neon-spo2)">-CORE</span></h3>
-        <p class="text-secondary mb-4">Nhập ID thiết bị để đồng bộ dữ liệu</p>
-        <input type="text" id="deviceIdInput" class="form-control mb-4" placeholder="VD: ESP8266_01">
-        <button onclick="accessSystem()" class="btn btn-medical w-100 py-3 fs-5">KẾT NỐI BẢO MẬT</button>
+        <i class="fas fa-fingerprint fa-4x mb-4" style="color: var(--neon-spo2); filter: drop-shadow(0 0 15px rgba(0,229,255,0.6));"></i>
+        <h3 class="fw-bold mb-2 text-white" style="letter-spacing: 2px;">MED<span style="color: var(--neon-spo2)">-CORE</span> <span style="font-size: 1rem; color: var(--neon-purple); vertical-align: top;">PRO</span></h3>
+        <p class="text-secondary mb-4">Xác thực hệ thống & Đồng bộ dữ liệu</p>
+        <input type="text" id="deviceIdInput" class="form-control mb-4" placeholder="Nhập ID Thiết Bị (VD: ESP8266_01)">
+        <button onclick="accessSystem()" class="btn btn-medical w-100 py-3 fs-5">KHỞI ĐỘNG HỆ THỐNG</button>
     </div>
 </div>
 
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
-        <h4 class="fw-bold text-white m-0 d-flex align-items-center logo-text">
-            <i class="fas fa-wave-square fs-4 me-2" style="color: var(--neon-spo2);"></i> MED-CORE
+        <h4 class="fw-bold text-white m-0 d-flex align-items-center logo-text" style="letter-spacing: 1px;">
+            <i class="fas fa-wave-square fs-4 me-2" style="color: var(--neon-spo2); filter: drop-shadow(0 0 8px var(--neon-spo2));"></i> MED-CORE
         </h4>
-        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars-staggered"></i></button>
     </div>
-    <div class="mt-3 flex-grow-1">
-        <div class="nav-link active" onclick="switchMenu('monitor', this)"><i class="fas fa-desktop nav-icon"></i> <span class="nav-text">Monitor (Trực tiếp)</span></div>
-        <div class="nav-link" onclick="switchMenu('patient', this)"><i class="fas fa-id-card nav-icon"></i> <span class="nav-text">Hồ sơ Bệnh nhân</span></div>
-        <div class="nav-link" onclick="switchMenu('analytics', this)"><i class="fas fa-brain nav-icon"></i> <span class="nav-text">Phân tích Bệnh lý</span></div>
-        <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-folder-open nav-icon"></i> <span class="nav-text">Lịch sử Đo lường</span></div>
-        <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-bell nav-icon"></i> <span class="nav-text">Nhật ký Cảnh báo</span></div>
+    <div class="mt-4 flex-grow-1">
+        <div class="nav-link active" onclick="switchMenu('monitor', this)"><i class="fas fa-desktop nav-icon"></i> <span class="nav-text">Monitor Trực Tiếp</span></div>
+        <div class="nav-link" onclick="switchMenu('patient', this)"><i class="fas fa-id-card-clip nav-icon"></i> <span class="nav-text">Hồ Sơ Bệnh Nhân</span></div>
+        <div class="nav-link" onclick="switchMenu('analytics', this)"><i class="fas fa-brain nav-icon"></i> <span class="nav-text">Phân Tích Bệnh Lý</span></div>
+        <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-chart-gantt nav-icon"></i> <span class="nav-text">Lịch Sử Đo Lường</span></div>
+        <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-triangle-exclamation nav-icon"></i> <span class="nav-text">Nhật Ký Cảnh Báo</span></div>
     </div>
 </div>
 
@@ -141,51 +177,54 @@
     
     <div class="patient-header">
         <div class="d-flex align-items-center">
-            <div class="p-3 rounded-circle me-3" style="background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3);">
-                <i class="fas fa-user-astronaut fs-3" style="color: var(--neon-spo2);"></i>
+            <div class="p-3 rounded-circle me-4" style="background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.3); box-shadow: inset 0 0 15px rgba(0,229,255,0.1);">
+                <i class="fas fa-user-astronaut fs-2" style="color: var(--neon-spo2);"></i>
             </div>
             <div>
-                <h4 class="mb-1 fw-bold">Thiết bị: <span id="idDisplay" style="color: var(--neon-spo2); text-shadow: var(--glow-spo2);">Đang chờ...</span></h4>
-                <div class="text-secondary" id="realtimeClock"><i class="far fa-clock me-1"></i> --:--:--</div>
+                <h4 class="mb-1 fw-bold">Trạm Kết Nối: <span id="idDisplay" style="color: var(--neon-spo2); text-shadow: var(--glow-spo2);">Đang chờ...</span></h4>
+                <div class="text-secondary" id="realtimeClock" style="font-family: monospace; font-size: 1.1rem;"><i class="far fa-clock me-2"></i>--:--:--</div>
             </div>
         </div>
         <div class="text-end">
-            <div id="connectionStatus" class="badge-status bg-alert mb-2">
-                <i class="fas fa-circle me-1" id="statusDot"></i> <span id="statusText">Mất kết nối</span>
+            <div id="connectionStatus" class="badge-status mb-2" style="background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-secondary);">
+                <i class="fas fa-circle-notch fa-spin me-2" id="statusDot"></i> <span id="statusText">Chưa xác thực</span>
             </div>
-            <div class="text-secondary small">Trạng thái WSS: <span class="text-success">Online</span></div>
+            <div class="text-secondary small">WSS Server: <span class="text-success fw-bold" style="text-shadow: 0 0 5px var(--neon-success);">ONLINE</span></div>
         </div>
     </div>
 
     <div id="monitor" class="tab-pane active">
-        <div class="row">
+        <div class="row g-4">
             <div class="col-xl-6">
-                <div class="card-stat">
+                <div class="card-stat card-hr">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="card-title-sm"><i class="fas fa-heartbeat me-2"></i>Chỉ số Nhịp tim</div>
+                        <div class="card-title-sm"><i class="fas fa-heart-pulse me-2"></i>Tần Số Tim (Heart Rate)</div>
                         <i class="fas fa-heart fs-3 heart-beat"></i>
                     </div>
                     <div class="value-display val-hr" id="bpmVal">--<span class="value-unit">BPM</span></div>
-                    <div style="height: 180px; margin-top: 20px;"><canvas id="bpmChart"></canvas></div>
+                    <div style="height: 200px; margin-top: 20px;"><canvas id="bpmChart"></canvas></div>
                 </div>
             </div>
             <div class="col-xl-6">
-                <div class="card-stat">
+                <div class="card-stat card-spo2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="card-title-sm"><i class="fas fa-lungs me-2"></i>Nồng độ Oxy máu</div>
-                        <i class="fas fa-wind fs-3" style="color: var(--neon-spo2); filter: drop-shadow(var(--glow-spo2));"></i>
+                        <div class="card-title-sm"><i class="fas fa-lungs me-2"></i>Độ Bão Hòa Oxy (SpO2)</div>
+                        <i class="fas fa-wind fs-3" style="color: var(--neon-spo2); filter: drop-shadow(var(--glow-spo2)); animation: translateY 3s ease-in-out infinite alternate;"></i>
                     </div>
                     <div class="value-display val-spo2" id="spo2Val">--<span class="value-unit">%</span></div>
-                    <div style="height: 180px; margin-top: 20px;"><canvas id="spo2Chart"></canvas></div>
+                    <div style="height: 200px; margin-top: 20px;"><canvas id="spo2Chart"></canvas></div>
                 </div>
             </div>
         </div>
 
         <div class="card-stat mt-2">
-            <div class="card-title-sm mb-3">Diễn biến lâm sàng (Live Stream)</div>
+            <div class="card-title-sm mb-3 d-flex justify-content-between align-items-center">
+                <span>Diễn biến lâm sàng (Live Stream)</span>
+                <span class="badge bg-danger rounded-pill pulse-badge" style="box-shadow: var(--glow-hr);"><i class="fas fa-circle me-1" style="font-size: 8px;"></i> LIVE</span>
+            </div>
             <div class="table-responsive">
                 <table class="table-custom">
-                    <thead><tr><th>Thời gian đo</th><th>Nhịp tim (BPM)</th><th>Nồng độ SpO2</th><th>Đánh giá y tế</th></tr></thead>
+                    <thead><tr><th>Timestamp</th><th>Nhịp Tim</th><th>SpO2</th><th>Phân Tích Nhanh</th></tr></thead>
                     <tbody id="liveTable"></tbody>
                 </table>
             </div>
@@ -198,29 +237,26 @@
             <form id="patientForm" onsubmit="savePatient(event)">
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <label class="text-secondary mb-1">Họ và tên Bệnh nhân</label>
+                        <label class="text-secondary mb-2">Họ và tên Bệnh nhân</label>
                         <input type="text" class="form-control form-control-neon" id="pName" value="Nguyễn Văn A" required>
                     </div>
                     <div class="col-md-3">
-                        <label class="text-secondary mb-1">Tuổi</label>
+                        <label class="text-secondary mb-2">Tuổi</label>
                         <input type="number" class="form-control form-control-neon" id="pAge" value="45">
                     </div>
                     <div class="col-md-3">
-                        <label class="text-secondary mb-1">Nhóm máu</label>
+                        <label class="text-secondary mb-2">Nhóm máu</label>
                         <select class="form-select form-control-neon" id="pBlood">
-                            <option value="O+">O+</option>
-                            <option value="A+">A+</option>
-                            <option value="B+">B+</option>
-                            <option value="AB+">AB+</option>
+                            <option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option>
                         </select>
                     </div>
                     <div class="col-12">
-                        <label class="text-secondary mb-1">Tiền sử bệnh lý ghi chú</label>
-                        <textarea class="form-control form-control-neon" rows="3" id="pHistory">Đang theo dõi rối loạn nhịp tim.</textarea>
+                        <label class="text-secondary mb-2">Tiền sử bệnh lý / Ghi chú y khoa</label>
+                        <textarea class="form-control form-control-neon" rows="4" id="pHistory">Đang theo dõi rối loạn nhịp tim. Bệnh nhân có tiền sử tăng huyết áp vô căn.</textarea>
                     </div>
                     <div class="col-12 mt-4 text-end">
-                        <span id="saveStatus" class="me-3 text-success" style="display:none;"><i class="fas fa-check"></i> Đã lưu thành công!</span>
-                        <button type="submit" class="btn btn-outline-info px-4" style="border-color: var(--neon-spo2); color: var(--neon-spo2);"><i class="fas fa-save me-2"></i> Cập nhật hồ sơ</button>
+                        <span id="saveStatus" class="me-3 text-success fw-bold" style="display:none; text-shadow: var(--glow-success);"><i class="fas fa-check-double"></i> Đã đồng bộ lên Cloud!</span>
+                        <button type="submit" class="btn btn-outline-info px-4 py-2" style="border-color: var(--neon-spo2); color: var(--neon-spo2); border-radius: 10px; transition: 0.3s;"><i class="fas fa-cloud-arrow-up me-2"></i> Lưu Cập Nhật</button>
                     </div>
                 </div>
             </form>
@@ -230,24 +266,24 @@
     <div id="analytics" class="tab-pane">
         <div class="row">
             <div class="col-lg-8 mx-auto">
-                <div class="card-stat">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-microscope fa-3x mb-3" style="color: #b19cd9; filter: drop-shadow(0 0 10px rgba(177, 156, 217, 0.5));"></i>
-                        <h4 class="text-white">Hệ Thống Phân Tích Bệnh Lý Trực Tuyến</h4>
-                        <p class="text-secondary small">Dựa trên dữ liệu thời gian thực thu thập từ cảm biến</p>
+                <div class="card-stat" style="border-top: 4px solid var(--neon-purple);">
+                    <div class="text-center mb-4 mt-2">
+                        <i class="fas fa-network-wired fa-3x mb-3" style="color: var(--neon-purple); filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.6));"></i>
+                        <h3 class="text-white fw-bold">AI Diagnostic Engine</h3>
+                        <p class="text-secondary">Thuật toán phân tích dựa trên Data Streaming thời gian thực</p>
                     </div>
                     
-                    <div class="d-grid gap-2">
-                        <button onclick="runDiagnosis()" class="btn btn-primary py-3 fw-bold" style="background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); border: none; box-shadow: 0 4px 15px rgba(37, 117, 252, 0.4);">
-                            <i class="fas fa-sync-alt me-2" id="diagIcon"></i> CHẠY CHUẨN ĐOÁN DỮ LIỆU HIỆN TẠI
+                    <div class="d-grid gap-2 mt-5">
+                        <button onclick="runDiagnosis()" class="btn py-3 fw-bold fs-6" style="background: linear-gradient(90deg, #5a189a 0%, var(--neon-purple) 100%); color: white; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(157, 78, 221, 0.4); transition: transform 0.3s, filter 0.3s;">
+                            <i class="fas fa-microchip me-2" id="diagIcon"></i> BẮT ĐẦU QUÉT PHÂN TÍCH
                         </button>
                     </div>
 
                     <div id="diagnosisResult" class="diag-box mt-4">
-                        <h5 class="fw-bold mb-2" id="diagTitle">Kết quả...</h5>
-                        <p id="diagDetail" class="m-0 text-white"></p>
-                        <div class="mt-3 text-secondary small" style="border-top: 1px dashed var(--border-color); padding-top: 10px;">
-                            <i class="fas fa-info-circle"></i> Lưu ý: Kết quả phân tích dựa trên ngưỡng đo lường chuẩn, không thay thế chẩn đoán y khoa chính thức từ bác sĩ.
+                        <h4 class="fw-bold mb-3" id="diagTitle">Kết quả...</h4>
+                        <p id="diagDetail" class="m-0 text-white fs-5" style="line-height: 1.6;"></p>
+                        <div class="mt-4 text-secondary small" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                            <i class="fas fa-shield-halved me-1"></i> Tuyên bố miễn trừ: AI Med-Core chỉ hỗ trợ nhận diện dấu hiệu lâm sàng. Không thay thế chẩn đoán y khoa từ bác sĩ chuyên ngành.
                         </div>
                     </div>
                 </div>
@@ -258,12 +294,12 @@
     <div id="history" class="tab-pane">
         <div class="card-stat">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold m-0"><i class="fas fa-database me-2" style="color: var(--neon-spo2);"></i> Cơ sở dữ liệu</h4>
-                <button class="btn btn-outline-danger btn-sm" onclick="document.getElementById('fullHistoryTable').innerHTML = ''"><i class="fas fa-trash-alt me-1"></i> Xóa Data</button>
+                <h4 class="fw-bold m-0"><i class="fas fa-server me-2" style="color: var(--neon-spo2);"></i> Data Warehouse</h4>
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="document.getElementById('fullHistoryTable').innerHTML = ''"><i class="fas fa-trash-can me-1"></i> Clear Data</button>
             </div>
-            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
                 <table class="table-custom">
-                    <thead style="position: sticky; top: 0; background: var(--bg-card); z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.5);">
+                    <thead style="position: sticky; top: 0; background: rgba(20, 20, 29, 0.95); backdrop-filter: blur(10px); z-index: 10;">
                         <tr><th>Timestamp</th><th>Device ID</th><th>Heart Rate</th><th>SpO2</th><th>Trạng thái</th></tr>
                     </thead>
                     <tbody id="fullHistoryTable"></tbody>
@@ -273,11 +309,11 @@
     </div>
 
     <div id="alerts" class="tab-pane">
-        <div class="card-stat">
-            <h4 class="fw-bold mb-4" style="color: var(--neon-hr); text-shadow: var(--glow-hr);"><i class="fas fa-exclamation-triangle me-2"></i> Nhật ký khẩn cấp</h4>
+        <div class="card-stat" style="border-color: rgba(255, 42, 95, 0.3);">
+            <h4 class="fw-bold mb-4" style="color: var(--neon-hr); text-shadow: var(--glow-hr);"><i class="fas fa-triangle-exclamation me-2 fa-fade"></i> Nhật Ký Cảnh Báo Khẩn Cấp</h4>
             <div class="table-responsive">
                 <table class="table-custom">
-                    <thead><tr><th>Thời gian</th><th>Loại cảnh báo</th><th>Chỉ số ghi nhận</th></tr></thead>
+                    <thead><tr><th>Thời Gian Phát Hiện</th><th>Cấp Độ Cảnh Báo</th><th>Chỉ Số Ghi Nhận</th></tr></thead>
                     <tbody id="alertTable"></tbody>
                 </table>
             </div>
@@ -289,8 +325,21 @@
 <script>
     // --- UI LOGIC ---
     function switchMenu(tabId, element) {
-        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
+        // Chỉ chạy nếu bấm vào tab khác tab hiện tại
+        if(element.classList.contains('active')) return;
+
+        // Xóa active cũ
+        document.querySelectorAll('.tab-pane').forEach(el => {
+            el.classList.remove('active');
+            el.style.animation = 'none'; // reset animation
+            el.offsetHeight; /* trigger reflow */
+        });
+        
+        // Thêm active mới và kích hoạt animation
+        const targetTab = document.getElementById(tabId);
+        targetTab.classList.add('active');
+        targetTab.style.animation = null;
+
         document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
         element.classList.add('active');
     }
@@ -304,14 +353,24 @@
         e.preventDefault();
         const status = document.getElementById('saveStatus');
         status.style.display = 'inline-block';
+        status.style.animation = 'popIcon 0.5s ease forwards';
         setTimeout(() => { status.style.display = 'none'; }, 3000);
     }
 
     setInterval(() => { 
-        document.getElementById('realtimeClock').innerHTML = `<i class="far fa-clock me-1"></i> ${new Date().toLocaleString('vi-VN')}`; 
+        // Hiệu ứng nhấp nháy cho dấu hai chấm của đồng hồ
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN').replace(/:/g, '<span style="animation: pulse 1s infinite;">:</span>');
+        const dateStr = now.toLocaleDateString('vi-VN');
+        document.getElementById('realtimeClock').innerHTML = `<i class="far fa-clock me-2" style="color: var(--neon-spo2)"></i> ${timeStr} | ${dateStr}`; 
     }, 1000);
 
-    // --- FIREBASE & CHART LOGIC ---
+    // Thêm CSS nhấp nháy vào JS cho gọn
+    const style = document.createElement('style');
+    style.innerHTML = `@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`;
+    document.head.appendChild(style);
+
+    // --- FIREBASE & CHART LOGIC (Giữ nguyên như cũ, chỉ làm đẹp Chart) ---
     const firebaseConfig = {
         apiKey: "AIzaSyBiDaQIash5NR2nH8FhQa56jj3OqxPM210",
         authDomain: "doan2-cdeec.firebaseapp.com",
@@ -323,55 +382,64 @@
     const db = firebase.database();
     let currentId = "";
     let bpmChart, spo2Chart;
-    
-    // Biến toàn cục để lưu dữ liệu realtime dùng cho Phân tích
     let currentBPM = 0;
     let currentSPO2 = 0;
 
-    // Cấu hình Chart Dark Neon
-    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.color = '#8b9bb4';
     Chart.defaults.font.family = 'Segoe UI';
 
     function initCharts() {
+        // Khởi tạo gradient cho biểu đồ
+        const ctxBpm = document.getElementById('bpmChart').getContext('2d');
+        const gradBpm = ctxBpm.createLinearGradient(0, 0, 0, 200);
+        gradBpm.addColorStop(0, 'rgba(255, 42, 95, 0.4)');
+        gradBpm.addColorStop(1, 'rgba(255, 42, 95, 0.01)');
+
+        const ctxSpo2 = document.getElementById('spo2Chart').getContext('2d');
+        const gradSpo2 = ctxSpo2.createLinearGradient(0, 0, 0, 200);
+        gradSpo2.addColorStop(0, 'rgba(0, 229, 255, 0.4)');
+        gradSpo2.addColorStop(1, 'rgba(0, 229, 255, 0.01)');
+
         const commonOptions = { 
-            responsive: true, maintainAspectRatio: false, plugins: { legend: false }, 
+            responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(20,20,29,0.9)', titleColor: '#00e5ff', borderColor: '#232332', borderWidth: 1 } }, 
             scales: { 
                 x: { display: false }, 
-                y: { grid: { color: "rgba(255,255,255,0.05)", drawBorder: false }, suggestedMin: 40, suggestedMax: 120 } 
+                y: { grid: { color: "rgba(255,255,255,0.03)", drawBorder: false }, suggestedMin: 40, suggestedMax: 120 } 
             },
-            elements: { line: { tension: 0.4 }, point: { radius: 2, hoverRadius: 6 } },
-            animation: { duration: 400 }
+            elements: { line: { tension: 0.45 }, point: { radius: 0, hoverRadius: 8, hitRadius: 10 } },
+            animation: { duration: 600, easing: 'easeOutQuart' }
         };
 
-        bpmChart = new Chart(document.getElementById('bpmChart'), { 
+        bpmChart = new Chart(ctxBpm, { 
             type: 'line', 
-            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#ff2a5f', backgroundColor: 'rgba(255, 42, 95, 0.1)', borderWidth: 3, fill: true, pointBackgroundColor: '#ff2a5f' }] }, 
+            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#ff2a5f', backgroundColor: gradBpm, borderWidth: 4, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#ff2a5f', pointBorderWidth: 2 }] }, 
             options: commonOptions 
         });
 
         const spo2Options = JSON.parse(JSON.stringify(commonOptions));
-        spo2Options.scales.y.suggestedMin = 85;
+        spo2Options.scales.y.suggestedMin = 80;
         spo2Options.scales.y.suggestedMax = 100;
 
-        spo2Chart = new Chart(document.getElementById('spo2Chart'), { 
+        spo2Chart = new Chart(ctxSpo2, { 
             type: 'line', 
-            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#00e5ff', backgroundColor: 'rgba(0, 229, 255, 0.1)', borderWidth: 3, fill: true, pointBackgroundColor: '#00e5ff' }] }, 
+            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#00e5ff', backgroundColor: gradSpo2, borderWidth: 4, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#00e5ff', pointBorderWidth: 2 }] }, 
             options: spo2Options 
         });
     }
 
     function accessSystem() {
         const input = document.getElementById('deviceIdInput').value.trim();
-        if(!input) return alert("Vui lòng nhập mã thiết bị!");
+        if(!input) return alert("Vui lòng nhập ID thiết bị (Ví dụ: ESP8266_01)!");
         currentId = input;
         
+        // Hiệu ứng biến mất khung Login mượt mà
         document.getElementById('login-overlay').style.opacity = "0";
         setTimeout(() => {
-            document.getElementById('login-overlay').style.display = "none";
+            document.getElementById('login-overlay').style.visibility = "hidden";
             document.getElementById('idDisplay').innerText = currentId;
             initCharts();
             startListening();
-        }, 400);
+        }, 600);
     }
 
     function startListening() {
@@ -392,18 +460,17 @@
             
             if(currentBPM > 0) {
                 badge.className = "badge-status bg-normal mb-2";
-                dot.className = "fas fa-circle me-1 text-success";
-                txt.innerText = "Đang thu thập";
+                dot.className = "fas fa-circle me-2 text-success";
+                txt.innerText = "Đang Đồng Bộ Dữ Liệu";
             } else {
                 badge.className = "badge-status mb-2";
                 badge.style.background = "rgba(255, 183, 3, 0.1)";
                 badge.style.border = "1px solid rgba(255, 183, 3, 0.3)";
                 badge.style.color = "var(--neon-warning)";
-                dot.className = "fas fa-circle me-1";
-                txt.innerText = "Chờ đặt tay";
+                dot.className = "fas fa-spinner fa-pulse me-2";
+                txt.innerText = "Đang Chờ Cảm Biến...";
             }
 
-            // Cập nhật biểu đồ
             bpmChart.data.datasets[0].data.push(currentBPM);
             if(bpmChart.data.datasets[0].data.length > 20) bpmChart.data.datasets[0].data.shift();
             bpmChart.update();
@@ -412,104 +479,102 @@
             if(spo2Chart.data.datasets[0].data.length > 20) spo2Chart.data.datasets[0].data.shift();
             spo2Chart.update();
 
-            // Lưu log
             if(currentBPM > 0) {
                 const timeStr = new Date().toLocaleTimeString('vi-VN');
                 const fullTimeStr = new Date().toLocaleString('vi-VN');
                 const statusHtml = isDanger 
-                    ? `<span class="badge-status bg-alert"><i class="fas fa-bolt"></i> Cảnh báo</span>`
-                    : `<span class="badge-status bg-normal"><i class="fas fa-check"></i> Ổn định</span>`;
+                    ? `<span class="badge-status bg-alert"><i class="fas fa-skull-crossbones me-1"></i> BẤT THƯỜNG</span>`
+                    : `<span class="badge-status bg-normal"><i class="fas fa-check-circle me-1"></i> ỔN ĐỊNH</span>`;
                 
-                const liveRow = `<tr><td>${timeStr}</td><td class="fw-bold" style="color: var(--neon-hr)">${currentBPM}</td><td class="fw-bold" style="color: var(--neon-spo2)">${currentSPO2}%</td><td>${statusHtml}</td></tr>`;
+                const liveRow = `<tr><td class="text-secondary">${timeStr}</td><td class="fw-bold fs-5" style="color: var(--neon-hr)">${currentBPM}</td><td class="fw-bold fs-5" style="color: var(--neon-spo2)">${currentSPO2}%</td><td>${statusHtml}</td></tr>`;
                 const liveTable = document.getElementById('liveTable');
                 liveTable.insertAdjacentHTML('afterbegin', liveRow);
-                if(liveTable.rows.length > 5) liveTable.deleteRow(5);
+                if(liveTable.rows.length > 6) liveTable.deleteRow(6);
 
-                const histRow = `<tr><td>${fullTimeStr}</td><td>${currentId}</td><td>${currentBPM}</td><td>${currentSPO2}%</td><td>${statusHtml}</td></tr>`;
+                const histRow = `<tr><td>${fullTimeStr}</td><td class="text-info">${currentId}</td><td>${currentBPM}</td><td>${currentSPO2}%</td><td>${statusHtml}</td></tr>`;
                 document.getElementById('fullHistoryTable').insertAdjacentHTML('afterbegin', histRow);
 
                 if(isDanger) {
-                    const alertMsg = currentBPM > 100 ? "Nhịp tim nhanh (Tachycardia)" : (currentBPM < 50 ? "Nhịp tim chậm (Bradycardia)" : "Thiếu oxy trong máu (Hypoxia)");
-                    const alertRow = `<tr><td>${fullTimeStr}</td><td style="color: var(--neon-hr)" class="fw-bold">${alertMsg}</td><td>HR: ${currentBPM} | SpO2: ${currentSPO2}%</td></tr>`;
+                    const alertMsg = currentBPM > 100 ? "Tachycardia (Nhịp Nhanh)" : (currentBPM < 50 ? "Bradycardia (Nhịp Chậm)" : "Hypoxia (Thiếu Oxy)");
+                    const alertRow = `<tr><td>${fullTimeStr}</td><td style="color: var(--neon-hr)" class="fw-bold"><i class="fas fa-radiation fa-spin me-2"></i>${alertMsg}</td><td>HR: <span class="text-white">${currentBPM}</span> | SpO2: <span class="text-white">${currentSPO2}%</span></td></tr>`;
                     document.getElementById('alertTable').insertAdjacentHTML('afterbegin', alertRow);
                 }
             }
         });
     }
 
-    // --- LOGIC CHUẨN ĐOÁN Y KHOA (MÔ PHỎNG) ---
     function runDiagnosis() {
         const icon = document.getElementById('diagIcon');
+        const btn = icon.parentElement;
         const box = document.getElementById('diagnosisResult');
         const title = document.getElementById('diagTitle');
         const detail = document.getElementById('diagDetail');
         
-        // Hiệu ứng loading
-        icon.classList.add('fa-spin');
+        btn.style.transform = "scale(0.95)";
+        setTimeout(() => btn.style.transform = "scale(1)", 150);
+
+        icon.classList.remove('fa-microchip');
+        icon.classList.add('fa-spinner', 'fa-spin');
         box.style.display = 'none';
 
         setTimeout(() => {
-            icon.classList.remove('fa-spin');
+            icon.classList.remove('fa-spinner', 'fa-spin');
+            icon.classList.add('fa-microchip');
             box.style.display = 'block';
             
-            // Xóa class cũ
             box.classList.remove('diag-safe', 'diag-warn', 'diag-danger');
 
             if (currentBPM === 0 || currentSPO2 === 0) {
                 box.classList.add('diag-warn');
-                title.innerText = "Dữ liệu không đủ";
-                detail.innerText = "Bệnh nhân hiện chưa đặt tay lên cảm biến hoặc cảm biến mất kết nối. Vui lòng kiểm tra lại thiết bị phần cứng.";
+                title.innerHTML = '<i class="fas fa-triangle-exclamation"></i> KẾT NỐI DATA THẤT BẠI';
+                detail.innerHTML = "Hệ thống AI không nhận được luồng dữ liệu thời gian thực. Bệnh nhân có thể chưa tiếp xúc với cảm biến quang học hoặc Module thu phát sóng gặp sự cố.";
                 return;
             }
 
-            // Logic chẩn đoán
             let diagnosisArr = [];
             let isDanger = false;
             let isWarn = false;
 
-            // Đánh giá SpO2
             if (currentSPO2 >= 95) {
-                diagnosisArr.push("- <b>SpO2 Bình thường:</b> Độ bão hòa oxy trong máu tốt, chức năng phổi hoạt động bình thường.");
+                diagnosisArr.push("<i class='fas fa-check text-success me-2'></i><span style='color: var(--neon-spo2)'>Oxy Máu (SpO2):</span> Chỉ số bão hòa oxy tối ưu. Phổi trao đổi khí hiệu quả.");
             } else if (currentSPO2 >= 90) {
                 isWarn = true;
-                diagnosisArr.push("- <b>Thiếu oxy nhẹ (Mild Hypoxemia):</b> Bệnh nhân có dấu hiệu suy giảm hô hấp nhẹ, cần theo dõi thêm.");
+                diagnosisArr.push("<i class='fas fa-exclamation text-warning me-2'></i><span style='color: var(--neon-warning)'>Oxy Máu (SpO2):</span> Cảnh báo Mild Hypoxemia. Cần chú ý độ thoáng khí khu vực nghỉ ngơi.");
             } else {
                 isDanger = true;
-                diagnosisArr.push("- <b style='color: #ff2a5f'>Thiếu oxy máu nghiêm trọng (Hypoxia):</b> Nguy cơ suy hô hấp cấp, cần can thiệp y tế cung cấp oxy ngay lập tức.");
+                diagnosisArr.push("<i class='fas fa-skull text-danger me-2'></i><b style='color: var(--neon-hr); text-shadow: var(--glow-hr)'>Oxy Máu (SpO2):</b> Báo động Hypoxia! Nguy cơ hoại tử tế bào não do thiếu oxy cấp tính. Yêu cầu bình oxy dự phòng.");
             }
 
-            // Đánh giá Nhịp tim (Giả định người trưởng thành đang nghỉ ngơi)
             if (currentBPM >= 60 && currentBPM <= 100) {
-                diagnosisArr.push("- <b>Nhịp tim Bình thường (Normocardia):</b> Tần số tim trong ngưỡng an toàn khi nghỉ ngơi.");
+                diagnosisArr.push("<i class='fas fa-check text-success me-2'></i><span style='color: var(--neon-spo2)'>Nhịp Tim (HR):</span> Tần số tim xoang hoàn toàn ổn định.");
             } else if (currentBPM > 100 && currentBPM <= 120) {
                 isWarn = true;
-                diagnosisArr.push("- <b>Nhịp tim Nhanh nhẹ (Tachycardia):</b> Có thể do lo âu, vận động nhẹ hoặc sốt. Cần kiểm tra thân nhiệt.");
+                diagnosisArr.push("<i class='fas fa-exclamation text-warning me-2'></i><span style='color: var(--neon-warning)'>Nhịp Tim (HR):</span> Nhịp nhanh thể nhẹ. Có thể do sốt, căng thẳng hoặc phản ứng thuốc.");
             } else if (currentBPM > 120) {
                 isDanger = true;
-                diagnosisArr.push("- <b style='color: #ff2a5f'>Nhịp tim Nhanh bất thường (Severe Tachycardia):</b> Cảnh báo rung nhĩ hoặc bệnh lý tim mạch cấp tính.");
+                diagnosisArr.push("<i class='fas fa-skull text-danger me-2'></i><b style='color: var(--neon-hr); text-shadow: var(--glow-hr)'>Nhịp Tim (HR):</b> Rung nhĩ cấp/Tachycardia nghiêm trọng. Cần đo ECG ngay lập tức.");
             } else if (currentBPM < 60 && currentBPM > 40) {
                 isWarn = true;
-                diagnosisArr.push("- <b>Nhịp tim Chậm (Bradycardia):</b> Bình thường ở vận động viên thể thao, nhưng nếu kèm mệt mỏi có thể do rối loạn nút xoang.");
+                diagnosisArr.push("<i class='fas fa-exclamation text-warning me-2'></i><span style='color: var(--neon-warning)'>Nhịp Tim (HR):</span> Bradycardia sinh lý. Bình thường ở người tập thể thao, cần hỏi lại tiền sử.");
             } else {
                 isDanger = true;
-                diagnosisArr.push("- <b style='color: #ff2a5f'>Nhịp tim Chậm nghiêm trọng:</b> Máu bơm không đủ lên não, nguy cơ ngất xỉu hoặc trụy tim mạch.");
+                diagnosisArr.push("<i class='fas fa-skull text-danger me-2'></i><b style='color: var(--neon-hr); text-shadow: var(--glow-hr)'>Nhịp Tim (HR):</b> Suy nút xoang nghiêm trọng. Nguy cơ máu không bơm đủ lên não gây ngất.");
             }
 
-            // Hiển thị kết quả
             detail.innerHTML = diagnosisArr.join("<br><br>");
 
             if (isDanger) {
                 box.classList.add('diag-danger');
-                title.innerHTML = '<i class="fas fa-siren-on"></i> CẢNH BÁO LÂM SÀNG NGHIÊM TRỌNG';
+                title.innerHTML = '<i class="fas fa-siren-on fa-beat-fade" style="color: var(--neon-hr)"></i> CẢNH BÁO LÂM SÀNG NGHIÊM TRỌNG';
             } else if (isWarn) {
                 box.classList.add('diag-warn');
-                title.innerHTML = '<i class="fas fa-exclamation-circle"></i> THEO DÕI & CHÚ Ý';
+                title.innerHTML = '<i class="fas fa-magnifying-glass-chart" style="color: var(--neon-warning)"></i> CHỈ ĐỊNH THEO DÕI Y TẾ';
             } else {
                 box.classList.add('diag-safe');
-                title.innerHTML = '<i class="fas fa-heartbeat"></i> KẾT LUẬN: BÌNH THƯỜNG';
+                title.innerHTML = '<i class="fas fa-shield-check" style="color: var(--neon-success)"></i> BÁO CÁO: HOÀN TOÀN KHỎE MẠNH';
             }
 
-        }, 1500); // Giả lập AI đang "suy nghĩ" 1.5 giây
+        }, 1800); 
     }
 </script>
 </body>
