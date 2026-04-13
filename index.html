@@ -3,225 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MED-IOT | Pro Monitor</title>
+    <title>Hệ Thống Theo Dõi Y Tế Chuyên Sâu</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
+        /* BẢNG MÀU CHUẨN LÂM SÀNG (ĐỘ TƯƠNG PHẢN CAO) */
         :root { 
-            --bg-dark: #0b1120; 
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --neon-red: #ff2a5f;
-            --neon-cyan: #00f3ff;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --bg-body: #0f172a;        /* Xanh đen đậm */
+            --bg-sidebar: #1e293b;     /* Slate 800 */
+            --bg-card: #1e293b;        /* Slate 800 */
+            --text-primary: #ffffff;   /* Trắng tinh */
+            --text-secondary: #cbd5e1; /* Xám sáng dễ đọc */
+            --border-color: #334155;   /* Viền xám nổi bật */
+            --color-hr: #ff4757;       /* Đỏ nhịp tim */
+            --color-spo2: #1e90ff;     /* Xanh dương SpO2 */
+            --color-success: #2ed573;
+            --color-warning: #ffa502;
         }
+
         body { 
-            background: var(--bg-dark); 
-            background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             overflow-x: hidden; 
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
-        
-        #login-overlay { position: fixed; inset: 0; background: rgba(11, 17, 32, 0.95); backdrop-filter: blur(10px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 0.5s; }
-        .login-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 243, 255, 0.1); width: 380px; text-align: center; }
-        .login-card input { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: white; }
-        .login-card input:focus { background: rgba(0,0,0,0.5); color: white; border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0,243,255,0.3); }
-        .btn-neon { background: transparent; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); transition: 0.3s; }
-        .btn-neon:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan); }
 
-        .sidebar { background: rgba(15, 23, 42, 0.9); border-right: 1px solid rgba(255,255,255,0.05); height: 100vh; position: fixed; width: 260px; padding: 20px; backdrop-filter: blur(10px); z-index: 1000;}
-        .main-content { margin-left: 260px; padding: 30px; }
-        .nav-link { color: var(--text-muted); transition: 0.3s; cursor: pointer; }
-        .nav-link:hover, .nav-link.active { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,243,255,0.5); }
-        
-        .card-stat { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
-        .val-display { font-size: 4rem; font-weight: 800; font-family: monospace; letter-spacing: -2px; }
-        .unit { font-size: 1.5rem; color: var(--text-muted); font-weight: normal; letter-spacing: 0; }
-        
-        .text-neon-red { color: var(--neon-red); text-shadow: 0 0 15px rgba(255, 42, 95, 0.6); }
-        .text-neon-cyan { color: var(--neon-cyan); text-shadow: 0 0 15px rgba(0, 243, 255, 0.6); }
-        
-        .pulse { animation: heart 0.8s infinite; }
-        @keyframes heart { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
-        
-        .table { color: var(--text-main); }
-        .table thead { color: var(--text-muted); border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .table tbody tr { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* KHUNG ĐĂNG NHẬP */
+        #login-overlay { position: fixed; inset: 0; background: var(--bg-body); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 0.4s; }
+        .login-card { background: var(--bg-card); padding: 40px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 400px; text-align: center; }
+        .login-card input { background: var(--bg-body); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.1rem; padding: 12px; }
+        .login-card input:focus { background: #000; border-color: var(--color-spo2); color: white; box-shadow: none; }
+        .btn-medical { background-color: var(--color-spo2); color: white; font-weight: bold; border: none; transition: 0.2s; }
+        .btn-medical:hover { background-color: #157ae0; color: white; transform: translateY(-2px); }
 
-        /* Ẩn các phần nội dung ban đầu */
-        .tab-content { display: none; animation: fadeIn 0.4s; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* BỐ CỤC */
+        .sidebar { background: var(--bg-sidebar); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); background: #162032; }
+        .nav-link { color: var(--text-secondary); padding: 16px 25px; font-size: 1.05rem; border-left: 4px solid transparent; transition: 0.2s; cursor: pointer; }
+        .nav-link:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+        .nav-link.active { background: rgba(30, 144, 255, 0.1); color: var(--color-spo2); border-left-color: var(--color-spo2); font-weight: bold; }
+        .nav-icon { width: 30px; text-align: center; margin-right: 10px; }
         
-        @media (max-width: 768px) { .sidebar { display: none; } .main-content { margin-left: 0; } }
+        .main-content { margin-left: 280px; padding: 30px; }
+        
+        /* THẺ DỮ LIỆU (CARDS) */
+        .card-stat { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 25px; margin-bottom: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .card-title-sm { color: var(--text-secondary); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 15px; }
+        
+        /* CHỈ SỐ */
+        .value-display { font-size: 4.5rem; font-weight: 900; line-height: 1; margin: 10px 0; font-family: 'Courier New', Courier, monospace; }
+        .value-unit { font-size: 1.5rem; font-weight: normal; color: var(--text-secondary); margin-left: 8px; }
+        
+        /* BẢNG CHUYÊN NGHIỆP */
+        .table-custom { color: var(--text-primary); width: 100%; margin: 0; }
+        .table-custom th { color: var(--text-secondary); font-weight: 600; border-bottom: 2px solid var(--border-color); padding: 15px; text-transform: uppercase; font-size: 0.85rem; }
+        .table-custom td { padding: 15px; border-bottom: 1px solid var(--border-color); vertical-align: middle; font-size: 1.05rem; }
+        .table-custom tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* BADGE TRẠNG THÁI */
+        .badge-status { padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; }
+        .bg-normal { background: rgba(46, 213, 115, 0.15); color: var(--color-success); border: 1px solid rgba(46, 213, 115, 0.3); }
+        .bg-alert { background: rgba(255, 71, 87, 0.15); color: var(--color-hr); border: 1px solid rgba(255, 71, 87, 0.3); }
+
+        /* HIỆU ỨNG TAB */
+        .tab-pane { display: none; animation: slideIn 0.3s ease-out; }
+        .tab-pane.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HEADER THÔNG TIN NGƯỜI BỆNH */
+        .patient-header { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        
+        /* TIM ĐẬP */
+        .heart-beat { animation: pump 1s infinite; }
+        @keyframes pump { 0% { transform: scale(1); } 20% { transform: scale(1.15); } 40% { transform: scale(1); } }
     </style>
 </head>
 <body>
 
 <div id="login-overlay">
     <div class="login-card">
-        <i class="fas fa-heartbeat fa-4x mb-4 text-neon-cyan"></i>
-        <h4 class="fw-bold mb-1 text-white">SYSTEM LOGIN</h4>
-        <p class="text-muted small mb-4">Secure Medical Interface</p>
-        <input type="text" id="deviceIdInput" class="form-control mb-4 text-center py-2" placeholder="Nhập Device ID (VD: ESP8266_01)">
-        <button onclick="accessDevice()" class="btn btn-neon w-100 fw-bold py-2">TRUY CẬP HỆ THỐNG</button>
+        <i class="fas fa-hospital-user fa-4x mb-3" style="color: var(--color-spo2);"></i>
+        <h3 class="fw-bold mb-2 text-white">HỆ THỐNG QUẢN TRỊ Y TẾ</h3>
+        <p class="text-secondary mb-4">Nhập mã định danh giường bệnh / thiết bị</p>
+        <input type="text" id="deviceIdInput" class="form-control mb-4" placeholder="Ví dụ: ESP8266_01">
+        <button onclick="accessSystem()" class="btn btn-medical w-100 py-3 fs-5">KẾT NỐI HỆ THỐNG</button>
     </div>
 </div>
 
 <div class="sidebar">
-    <div class="mb-5 text-center mt-3">
-        <h3 class="fw-bold text-white"><i class="fas fa-wave-square text-neon-cyan me-2"></i>MED-PRO</h3>
+    <div class="sidebar-header">
+        <h4 class="fw-bold text-white m-0 d-flex align-items-center">
+            <i class="fas fa-plus-square fs-3 me-2" style="color: var(--color-spo2);"></i> MED-SYSTEM
+        </h4>
     </div>
-    <nav class="nav flex-column" id="sidebarMenu">
-        <a class="nav-link active fw-bold py-3" onclick="switchTab('dashboard')"><i class="fas fa-desktop me-3"></i> Monitor</a>
-        <a class="nav-link py-3" onclick="switchTab('history')"><i class="fas fa-notes-medical me-3"></i> Lịch sử bệnh án</a>
-        <a class="nav-link py-3" onclick="switchTab('settings')"><i class="fas fa-cogs me-3"></i> Thông tin thiết bị</a>
-    </nav>
+    <div class="mt-3 flex-grow-1">
+        <div class="nav-link active" onclick="switchMenu('monitor', this)"><i class="fas fa-desktop nav-icon"></i> Monitor (Trực tiếp)</div>
+        <div class="nav-link" onclick="switchMenu('patient', this)"><i class="fas fa-id-card nav-icon"></i> Hồ sơ Bệnh nhân</div>
+        <div class="nav-link" onclick="switchMenu('analytics', this)"><i class="fas fa-chart-line nav-icon"></i> Phân tích Chỉ số</div>
+        <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-folder-open nav-icon"></i> Lịch sử Khám bệnh</div>
+        <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-bell nav-icon"></i> Nhật ký Cảnh báo</div>
+    </div>
+    <div class="p-3 border-top" style="border-color: var(--border-color) !important;">
+        <div class="nav-link" onclick="switchMenu('settings', this)"><i class="fas fa-cog nav-icon"></i> Cài đặt Hệ thống</div>
+    </div>
 </div>
 
 <div class="main-content">
-    <div class="d-flex justify-content-between align-items-center mb-5">
-        <div>
-            <h2 class="fw-bold mb-1">Mã thiết bị: <span id="idDisplay" class="text-neon-cyan">---</span></h2>
-            <div class="text-muted" id="realtimeClock" style="font-family: monospace;">Đang kết nối hệ thống...</div>
+    
+    <div class="patient-header">
+        <div class="d-flex align-items-center">
+            <div class="bg-primary bg-opacity-25 p-3 rounded-circle me-3">
+                <i class="fas fa-user-injured fs-3 text-primary"></i>
+            </div>
+            <div>
+                <h4 class="mb-1 fw-bold">Giường/Thiết bị: <span id="idDisplay" class="text-info">Đang chờ...</span></h4>
+                <div class="text-secondary" id="realtimeClock"><i class="far fa-clock me-1"></i> --:--:--</div>
+            </div>
         </div>
-        <div id="connectionStatus" class="badge bg-dark border border-secondary p-2 px-3 rounded-pill">
-            <i class="fas fa-circle text-secondary me-2 pulse" id="statusDot"></i> <span id="statusText">Offline</span>
+        <div class="text-end">
+            <div id="connectionStatus" class="badge-status bg-alert mb-2">
+                <i class="fas fa-circle me-1" id="statusDot"></i> <span id="statusText">Mất kết nối</span>
+            </div>
+            <div class="text-secondary small">Trạng thái Server: Ổn định</div>
         </div>
     </div>
 
-    <div id="dashboard" class="tab-content active">
-        <div class="row g-4">
-            <div class="col-md-6">
+    <div id="monitor" class="tab-pane active">
+        <div class="row">
+            <div class="col-xl-6">
                 <div class="card-stat">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted fw-bold tracking-wide">HEART RATE (BPM)</span>
-                        <i class="fas fa-heart text-neon-red pulse fs-4"></i>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="card-title-sm"><i class="fas fa-heartbeat me-2"></i>Chỉ số Nhịp tim (BPM)</div>
+                        <i class="fas fa-heart fs-3 heart-beat" style="color: var(--color-hr);"></i>
                     </div>
-                    <div class="val-display text-neon-red" id="bpmVal">0<span class="unit">bpm</span></div>
-                    <div class="mt-3" style="height: 120px;"><canvas id="bpmChart"></canvas></div>
+                    <div class="value-display" style="color: var(--color-hr);" id="bpmVal">--<span class="value-unit">bpm</span></div>
+                    <div style="height: 180px; margin-top: 20px;"><canvas id="bpmChart"></canvas></div>
                 </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-xl-6">
                 <div class="card-stat">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted fw-bold tracking-wide">BLOOD OXYGEN (SPO2)</span>
-                        <i class="fas fa-lungs text-neon-cyan fs-4"></i>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="card-title-sm"><i class="fas fa-lungs me-2"></i>Nồng độ Oxy trong máu (SpO2)</div>
+                        <i class="fas fa-wind fs-3" style="color: var(--color-spo2);"></i>
                     </div>
-                    <div class="val-display text-neon-cyan" id="spo2Val">0<span class="unit">%</span></div>
-                    <div class="mt-3" style="height: 120px;"><canvas id="spo2Chart"></canvas></div>
+                    <div class="value-display" style="color: var(--color-spo2);" id="spo2Val">--<span class="value-unit">%</span></div>
+                    <div style="height: 180px; margin-top: 20px;"><canvas id="spo2Chart"></canvas></div>
                 </div>
             </div>
         </div>
-        <div class="card-stat mt-4">
-            <h5 class="fw-bold mb-3"><i class="fas fa-bolt text-warning me-2"></i> Diễn biến trực tiếp</h5>
+
+        <div class="card-stat mt-2">
+            <div class="card-title-sm mb-3">Diễn biến lâm sàng (Cập nhật trực tiếp)</div>
             <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead><tr><th>Thời gian</th><th>Nhịp tim (BPM)</th><th>SpO2</th><th>Trạng thái</th></tr></thead>
-                    <tbody id="liveTable"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div id="history" class="tab-content">
-        <div class="card-stat">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold m-0"><i class="fas fa-history text-neon-cyan me-2"></i> Toàn bộ lịch sử đo</h4>
-                <button class="btn btn-outline-danger btn-sm" onclick="clearHistory()"><i class="fas fa-trash me-1"></i> Xóa dữ liệu</button>
-            </div>
-            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                <table class="table align-middle">
-                    <thead style="position: sticky; top: 0; background: var(--card-bg);">
-                        <tr><th>Thời gian chuẩn</th><th>Mã thiết bị</th><th>BPM</th><th>SpO2</th><th>Chẩn đoán</th></tr>
-                    </thead>
-                    <tbody id="fullHistoryTable">
+                <table class="table-custom">
+                    <thead><tr><th>Thời gian đo</th><th>Nhịp tim (BPM)</th><th>Nồng độ SpO2</th><th>Đánh giá y tế</th></tr></thead>
+                    <tbody id="liveTable">
                         </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div id="settings" class="tab-content">
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card-stat">
-                    <h4 class="fw-bold mb-4"><i class="fas fa-microchip text-neon-cyan me-2"></i> Cấu hình phần cứng</h4>
-                    <ul class="list-group list-group-flush bg-transparent">
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Bo mạch chủ</span> <span>ESP8266 NodeMCU</span>
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Cảm biến</span> <span>MAX30105 Pulse/Oximeter</span>
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Màn hình hiển thị</span> <span>OLED SSD1306 (I2C)</span>
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Giao thức Mạng</span> <span>Wi-Fi 2.4GHz 802.11 b/g/n</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card-stat">
-                    <h4 class="fw-bold mb-4"><i class="fas fa-server text-neon-red me-2"></i> Hệ thống Server</h4>
-                    <ul class="list-group list-group-flush bg-transparent">
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Cơ sở dữ liệu</span> <span>Firebase Realtime DB</span>
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Region</span> <span>asia-southeast1 (Singapore)</span>
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Ngưỡng cảnh báo BPM</span> <span class="text-danger fw-bold">> 100 hoặc < 50</span>
-                        </li>
-                        <li class="list-group-item bg-transparent text-white border-secondary d-flex justify-content-between">
-                            <span class="text-muted">Ngưỡng cảnh báo SpO2</span> <span class="text-danger fw-bold">< 94%</span>
-                        </li>
-                    </ul>
-                </div>
+    <div id="patient" class="tab-pane">
+        <div class="card-stat">
+            <h4 class="fw-bold mb-4"><i class="fas fa-address-card me-2 text-info"></i> Thông tin bệnh nhân</h4>
+            <div class="row fs-5 text-secondary">
+                <div class="col-md-6 mb-3"><strong>Họ và tên:</strong> <span class="text-white">Nguyễn Văn A (Mẫu)</span></div>
+                <div class="col-md-6 mb-3"><strong>Tuổi:</strong> <span class="text-white">45</span></div>
+                <div class="col-md-6 mb-3"><strong>Giới tính:</strong> <span class="text-white">Nam</span></div>
+                <div class="col-md-6 mb-3"><strong>Nhóm máu:</strong> <span class="text-white">O+</span></div>
+                <div class="col-12 mt-3"><strong>Tiền sử bệnh lý:</strong> <span class="text-white">Tăng huyết áp vô căn, đang theo dõi điều trị.</span></div>
             </div>
         </div>
     </div>
+
+    <div id="analytics" class="tab-pane">
+        <div class="card-stat text-center py-5">
+            <i class="fas fa-chart-pie fa-4x text-secondary mb-3"></i>
+            <h4 class="text-white">Mô-đun Phân tích & AI chẩn đoán</h4>
+            <p class="text-secondary">Đang thu thập đủ dữ liệu 24h để đưa ra biểu đồ phân tích xu hướng...</p>
+        </div>
+    </div>
+
+    <div id="history" class="tab-pane">
+        <div class="card-stat">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0"><i class="fas fa-database me-2 text-info"></i> Cơ sở dữ liệu đo lường</h4>
+                <button class="btn btn-outline-light btn-sm" onclick="document.getElementById('fullHistoryTable').innerHTML = ''"><i class="fas fa-trash-alt me-1"></i> Xóa bảng</button>
+            </div>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table class="table-custom">
+                    <thead style="position: sticky; top: 0; background: var(--bg-card); z-index: 10;">
+                        <tr><th>Timestamp</th><th>Device ID</th><th>Heart Rate</th><th>Blood Oxygen</th><th>Status</th></tr>
+                    </thead>
+                    <tbody id="fullHistoryTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="alerts" class="tab-pane">
+        <div class="card-stat">
+            <h4 class="fw-bold mb-4 text-danger"><i class="fas fa-exclamation-triangle me-2"></i> Nhật ký cảnh báo khẩn cấp</h4>
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead><tr><th>Thời gian</th><th>Loại cảnh báo</th><th>Chỉ số ghi nhận</th></tr></thead>
+                    <tbody id="alertTable">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings" class="tab-pane">
+        <div class="card-stat">
+            <h4 class="fw-bold mb-4"><i class="fas fa-sliders-h me-2 text-info"></i> Thông số kỹ thuật</h4>
+            <table class="table-custom">
+                <tbody>
+                    <tr><td class="text-secondary">Giao thức kết nối</td><td class="text-white fw-bold">Firebase Realtime DB (WSS)</td></tr>
+                    <tr><td class="text-secondary">Ngưỡng Nhịp tim cảnh báo</td><td class="text-danger fw-bold">< 50 hoặc > 100 BPM</td></tr>
+                    <tr><td class="text-secondary">Ngưỡng SpO2 cảnh báo</td><td class="text-danger fw-bold">< 94%</td></tr>
+                    <tr><td class="text-secondary">Trạng thái Cảm biến</td><td class="text-success fw-bold">Hoạt động tốt</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>
 
 <script>
-    // --- Tính năng chuyển Tab ---
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    // XỬ LÝ CHUYỂN TAB
+    function switchMenu(tabId, element) {
+        document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
-
-        const links = document.querySelectorAll('#sidebarMenu .nav-link');
-        links.forEach(link => {
-            link.classList.remove('active', 'fw-bold');
-            link.style.color = "var(--text-muted)";
-        });
         
-        event.currentTarget.classList.add('active', 'fw-bold');
-        event.currentTarget.style.color = "var(--neon-cyan)";
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
     }
 
-    function clearHistory() {
-        if(confirm("Bạn có chắc muốn xóa toàn bộ lịch sử hiển thị trên bảng này?")) {
-            document.getElementById('fullHistoryTable').innerHTML = "";
-        }
-    }
+    // ĐỒNG HỒ THỜI GIAN THỰC
+    setInterval(() => { 
+        document.getElementById('realtimeClock').innerHTML = `<i class="far fa-clock me-1"></i> ${new Date().toLocaleString('vi-VN')}`; 
+    }, 1000);
 
-    // --- Firebase & System Core ---
+    // CẤU HÌNH FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyBiDaQIash5NR2nH8FhQa56jj3OqxPM210",
         authDomain: "doan2-cdeec.firebaseapp.com",
         databaseURL: "https://doan2-cdeec-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "doan2-cdeec",
-        storageBucket: "doan2-cdeec.firebasestorage.app",
-        messagingSenderId: "424476794342",
-        appId: "1:424476794342:web:3e59530ed2b69159d6ca27"
+        projectId: "doan2-cdeec"
     };
 
     firebase.initializeApp(firebaseConfig);
@@ -229,35 +264,42 @@
     let currentId = "";
     let bpmChart, spo2Chart;
 
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.font.family = 'Inter';
+    // CẤU HÌNH BIỂU ĐỒ (SÁNG SỦA, RÕ RÀNG)
+    Chart.defaults.color = '#cbd5e1';
+    Chart.defaults.font.family = 'Segoe UI';
+    Chart.defaults.font.size = 13;
 
     function initCharts() {
         const commonOptions = { 
-            responsive: true, maintainAspectRatio: false, plugins: { legend: false }, 
+            responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: { mode: 'index', intersect: false } }, 
             scales: { 
                 x: { display: false }, 
-                y: { grid: { color: "rgba(255,255,255,0.05)" }, border: { dash: [5, 5] } } 
+                y: { grid: { color: "#334155", drawBorder: false }, border: { dash: [5, 5] }, suggestedMin: 40, suggestedMax: 120 } 
             },
-            elements: { point: { radius: 0, hitRadius: 10, hoverRadius: 5 } }
+            elements: { line: { tension: 0.4 }, point: { radius: 2, hoverRadius: 6 } },
+            animation: { duration: 400 }
         };
 
         bpmChart = new Chart(document.getElementById('bpmChart'), { 
             type: 'line', 
-            data: { labels: Array(15).fill(''), datasets: [{ data: [], borderColor: '#ff2a5f', borderWidth: 3, tension: 0.4, shadowBlur: 10, shadowColor: '#ff2a5f' }] }, 
+            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#ff4757', backgroundColor: 'rgba(255, 71, 87, 0.1)', borderWidth: 3, fill: true }] }, 
             options: commonOptions 
         });
+
+        const spo2Options = JSON.parse(JSON.stringify(commonOptions));
+        spo2Options.scales.y.suggestedMin = 80;
+        spo2Options.scales.y.suggestedMax = 100;
 
         spo2Chart = new Chart(document.getElementById('spo2Chart'), { 
             type: 'line', 
-            data: { labels: Array(15).fill(''), datasets: [{ data: [], borderColor: '#00f3ff', borderWidth: 3, tension: 0.4 }] }, 
-            options: commonOptions 
+            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#1e90ff', backgroundColor: 'rgba(30, 144, 255, 0.1)', borderWidth: 3, fill: true }] }, 
+            options: spo2Options 
         });
     }
 
-    function accessDevice() {
+    function accessSystem() {
         const input = document.getElementById('deviceIdInput').value.trim();
-        if(!input) return alert("Hệ thống yêu cầu mã ID hợp lệ!");
+        if(!input) return alert("Vui lòng nhập mã thiết bị!");
         currentId = input;
         
         document.getElementById('login-overlay').style.opacity = "0";
@@ -266,7 +308,7 @@
             document.getElementById('idDisplay').innerText = currentId;
             initCharts();
             startListening();
-        }, 500);
+        }, 400);
     }
 
     function startListening() {
@@ -274,55 +316,67 @@
             const data = s.val();
             if(!data) return;
             
-            let bpmStr = data.bpm < 10 && data.bpm > 0 ? "0"+data.bpm : data.bpm;
-            let spo2Str = data.spo2;
+            // Xử lý dữ liệu
+            const bpm = data.bpm;
+            const spo2 = data.spo2;
+            const isDanger = (bpm > 100 || (bpm < 50 && bpm > 0) || spo2 < 94);
 
-            document.getElementById('bpmVal').innerHTML = `${bpmStr}<span class="unit">bpm</span>`;
-            document.getElementById('spo2Val').innerHTML = `${spo2Str}<span class="unit">%</span>`;
+            // Cập nhật số lớn
+            document.getElementById('bpmVal').innerHTML = `${bpm > 0 && bpm < 10 ? '0'+bpm : bpm}<span class="value-unit">bpm</span>`;
+            document.getElementById('spo2Val').innerHTML = `${spo2}<span class="value-unit">%</span>`;
             
-            document.getElementById('statusDot').className = "fas fa-circle text-success me-2 pulse";
-            document.getElementById('statusText').innerText = "Trực tuyến";
-            document.getElementById('statusText').className = "text-success fw-bold";
+            // Cập nhật trạng thái
+            const dot = document.getElementById('statusDot');
+            const txt = document.getElementById('statusText');
+            const badge = document.getElementById('connectionStatus');
+            
+            if(bpm > 0) {
+                badge.className = "badge-status bg-normal mb-2";
+                dot.className = "fas fa-circle text-success me-1";
+                txt.innerText = "Đang nhận dữ liệu";
+            } else {
+                badge.className = "badge-status bg-alert mb-2 text-warning";
+                dot.className = "fas fa-circle me-1";
+                txt.innerText = "Chờ đặt tay vào cảm biến";
+            }
 
-            [bpmChart, spo2Chart].forEach((c, i) => {
-                c.data.datasets[0].data.push(i === 0 ? data.bpm : data.spo2);
-                if(c.data.datasets[0].data.length > 15) c.data.datasets[0].data.shift();
-                c.update();
-            });
+            // Cập nhật biểu đồ (giữ 20 điểm)
+            bpmChart.data.datasets[0].data.push(bpm);
+            if(bpmChart.data.datasets[0].data.length > 20) bpmChart.data.datasets[0].data.shift();
+            bpmChart.update();
 
-            if(data.bpm > 0) {
-                const statusHtml = data.bpm > 100 || data.spo2 < 94 
-                    ? `<span class="badge bg-danger bg-opacity-25 text-danger border border-danger rounded-pill px-3">Cảnh báo</span>`
-                    : `<span class="badge bg-success bg-opacity-25 text-success border border-success rounded-pill px-3">Ổn định</span>`;
-                
+            spo2Chart.data.datasets[0].data.push(spo2);
+            if(spo2Chart.data.datasets[0].data.length > 20) spo2Chart.data.datasets[0].data.shift();
+            spo2Chart.update();
+
+            // Ghi log bảng biểu (chỉ ghi khi có nhịp tim thực)
+            if(bpm > 0) {
                 const timeStr = new Date().toLocaleTimeString('vi-VN');
+                const fullTimeStr = new Date().toLocaleString('vi-VN');
                 
-                // Đổ vào Bảng Diễn biến trực tiếp (Dashboard - Tối đa 5 dòng)
-                const liveRow = `<tr>
-                    <td class="text-muted">${timeStr}</td>
-                    <td class="fw-bold text-white">${data.bpm}</td>
-                    <td class="fw-bold text-white">${data.spo2}%</td>
-                    <td>${statusHtml}</td>
-                </tr>`;
+                const statusHtml = isDanger 
+                    ? `<span class="badge-status bg-alert"><i class="fas fa-exclamation-circle"></i> Bất thường</span>`
+                    : `<span class="badge-status bg-normal"><i class="fas fa-check-circle"></i> Ổn định</span>`;
+                
+                // Bảng Monitor (giữ 5 dòng)
+                const liveRow = `<tr><td>${timeStr}</td><td class="fw-bold">${bpm}</td><td class="fw-bold">${spo2}%</td><td>${statusHtml}</td></tr>`;
                 const liveTable = document.getElementById('liveTable');
                 liveTable.insertAdjacentHTML('afterbegin', liveRow);
                 if(liveTable.rows.length > 5) liveTable.deleteRow(5);
 
-                // Đổ vào Bảng Toàn bộ lịch sử (Tab Lịch sử - Lưu dài hơn)
-                const histRow = `<tr>
-                    <td class="text-muted">${new Date().toLocaleString('vi-VN')}</td>
-                    <td class="text-info">${currentId}</td>
-                    <td class="fw-bold text-white">${data.bpm}</td>
-                    <td class="fw-bold text-white">${data.spo2}%</td>
-                    <td>${statusHtml}</td>
-                </tr>`;
-                const fullHistory = document.getElementById('fullHistoryTable');
-                fullHistory.insertAdjacentHTML('afterbegin', histRow);
+                // Bảng History (Lưu liên tục)
+                const histRow = `<tr><td>${fullTimeStr}</td><td>${currentId}</td><td>${bpm}</td><td>${spo2}%</td><td>${statusHtml}</td></tr>`;
+                document.getElementById('fullHistoryTable').insertAdjacentHTML('afterbegin', histRow);
+
+                // Bảng Cảnh báo (Chỉ lưu khi nguy hiểm)
+                if(isDanger) {
+                    const alertMsg = bpm > 100 ? "Nhịp tim cao" : (bpm < 50 ? "Nhịp tim thấp" : "SpO2 giảm mạnh");
+                    const alertRow = `<tr><td>${fullTimeStr}</td><td class="text-danger fw-bold">${alertMsg}</td><td>HR: ${bpm} | SpO2: ${spo2}%</td></tr>`;
+                    document.getElementById('alertTable').insertAdjacentHTML('afterbegin', alertRow);
+                }
             }
         });
     }
-
-    setInterval(() => { document.getElementById('realtimeClock').innerText = new Date().toLocaleString('vi-VN') + " | SYSTEM SECURE"; }, 1000);
 </script>
 </body>
 </html>
