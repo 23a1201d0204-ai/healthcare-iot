@@ -229,6 +229,22 @@
         .news-list-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 15px; cursor: pointer; transition: 0.3s; }
         .news-list-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; }
         .news-list-item:last-child { border-bottom: none; }
+                .bg-purple { background: var(--neon-purple); color: white; }
+        
+        #startBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(157,78,221,0.7);
+        }
+        
+        @keyframes scanPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+        
+        #aiIcon {
+            animation: scanPulse 2s infinite ease-in-out;
+        }
     </style>
 </head>
 <body>
@@ -370,29 +386,49 @@
             </form>
         </div>
     </div>
-    <div id="analytics" class="tab-pane">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="card-stat" style="border-top: 4px solid var(--neon-purple);">
-                    <div class="text-center mb-4 mt-2">
-                        <i class="fas fa-network-wired fa-3x mb-3" style="color: var(--neon-purple); filter: drop-shadow(0 0 15px rgba(157, 78, 221, 0.6));"></i>
-                        <h3 class="text-white fw-bold">AI Diagnostic Engine</h3>
-                        <p class="text-secondary">Thuật toán phân tích dựa trên Data Streaming thời gian thực</p>
-                    </div>
+       <div id="analytics" class="tab-pane">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="card-stat" style="border-top: 5px solid var(--neon-purple); box-shadow: 0 0 40px rgba(157, 78, 221, 0.4);">
                     
-                    <div class="d-grid gap-2 mt-5">
-                        <button onclick="runDiagnosis()" class="btn py-3 fw-bold fs-6" style="background: linear-gradient(90deg, #5a189a 0%, var(--neon-purple) 100%); color: white; border: none; border-radius: 12px; box-shadow: 0 10px 25px rgba(157, 78, 221, 0.4); transition: transform 0.3s, filter 0.3s;">
-                            <i class="fas fa-microchip me-2" id="diagIcon"></i> BẮT ĐẦU QUÉT PHÂN TÍCH
+                    <!-- Header AI -->
+                    <div class="text-center py-4">
+                        <div class="d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px; background: rgba(157,78,221,0.15); border-radius: 50%; border: 3px solid var(--neon-purple);">
+                            <i class="fas fa-brain fa-3x" id="aiIcon" style="color: var(--neon-purple); filter: drop-shadow(0 0 20px var(--neon-purple));"></i>
+                        </div>
+                        <h2 class="fw-bold text-white mb-1">AI DIAGNOSTIC ENGINE</h2>
+                        <p class="text-secondary mb-0" style="font-size: 1.05rem;">
+                            Phân tích thời gian thực • Neural Network v2.1
+                        </p>
+                    </div>
+
+                    <!-- Nút bắt đầu -->
+                    <div class="d-grid gap-2 px-5 pb-5">
+                        <button onclick="runDiagnosis()" id="startBtn" 
+                                class="btn py-4 fw-bold fs-5 position-relative overflow-hidden"
+                                style="background: linear-gradient(90deg, #5a189a, var(--neon-purple)); 
+                                       border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(157,78,221,0.5);">
+                            <span id="btnText">BẮT ĐẦU QUÉT PHÂN TÍCH</span>
+                            <i class="fas fa-microchip ms-2" id="btnIcon"></i>
                         </button>
                     </div>
 
-                    <div id="diagnosisResult" class="diag-box mt-4">
-                        <h4 class="fw-bold mb-3" id="diagTitle">Kết quả...</h4>
-                        <p id="diagDetail" class="m-0 text-white fs-5" style="line-height: 1.6;"></p>
-                        <div class="mt-4 text-secondary small" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                            <i class="fas fa-shield-halved me-1"></i> Tuyên bố miễn trừ: AI Đồ Án 2 chỉ hỗ trợ nhận diện dấu hiệu lâm sàng. Không thay thế chẩn đoán y khoa từ bác sĩ chuyên ngành.
+                    <!-- Kết quả -->
+                    <div id="diagnosisResult" class="diag-box mt-3 mx-4" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="fw-bold mb-0" id="diagTitle">Kết quả phân tích</h4>
+                            <span id="confidenceScore" class="badge bg-purple px-3 py-2 fs-6"></span>
+                        </div>
+                        
+                        <div id="diagDetail" class="text-white fs-5" style="line-height: 1.8;"></div>
+
+                        <div class="mt-5 pt-4 border-top border-secondary">
+                            <div class="text-secondary small mb-2">Khuyến nghị ngay lập tức</div>
+                            <div id="recommendation" class="alert alert-dark border-0" style="border-radius: 12px;"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
