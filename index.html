@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Giám Sát Y Tế IoT</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        :root {
+            --primary: #00f2fe; --secondary: #4facfe;
+            --danger: #ff4b2b; --warning: #f9d423; --success: #00b09b;
+        }
+        body {
+            margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white; min-height: 100vh;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 3px; }
+        .status-dot { height: 10px; width: 10px; background-color: var(--success); border-radius: 50%; display: inline-block; margin-right: 5px; box-shadow: 0 0 10px var(--success); }
+
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+            padding: 20px; position: relative; overflow: hidden;
+        }
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+        }
+        .card.bpm::before { background: var(--danger); }
+        .card.spo2::before { background: var(--secondary); }
+
+        .card-title { font-size: 0.9rem; color: #ccc; text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+        .value { font-size: 4rem; font-weight: 800; margin: 15px 0; }
+        .unit { font-size: 1.2rem; font-weight: 300; color: #aaa; }
+        
+        .chart-box { height: 180px; margin-top: 15px; }
+        
+        /* Hiệu ứng nháy khi nguy hiểm */
+        .alarm { animation: pulse-red 1s infinite; color: var(--danger) !important; }
+        @keyframes pulse-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1><i class="fas fa-heartbeat"></i> MEDICAL DASHBOARD</h1>
+        <p><span class="status-dot"></span> Hệ thống đang trực tuyến | <span id="time">00:00:00</span></p>
+    </div>
+
+    <div class="dashboard">
+        <div class="card bpm">
+            <div class="card-title"><i class="fas fa-pills"></i> Nhịp Tim</div>
+            <div class="value" id="bpm_val">0 <span class="unit">BPM</span></div>
+            <div class="chart-box"><canvas id="bpmChart"></canvas></div>
+        </div>
+
+        <div class="card spo2">
+            <div class="card-title"><i class="fas fa-wind"></i> Nồng độ Oxy</div>
+            <div class="value" id="spo2_val">0 <span class="unit">%</span></div>
+            <div class="chart-box"><canvas id="spo2Chart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. THAY THẾ CONFIG CỦA BẠN VÀO ĐÂY
+    const firebaseConfig = {
+        apiKey: "AIzaSyBiDaQIash5NR2nH8FhQa56jj3OqxPM210",
+        authDomain: "doan2-cdeec.firebaseapp.com",
+        databaseURL: "https://doan2-cdeec-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "doan2-cdeec",
+        storageBucket: "doan2-cdeec.firebasestorage.app",
+        messagingSenderId: "424476794342",
+        appId: "1:424476794342:web:3e59530ed2b69159d6ca27"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Khởi tạo Biểu đồ
+    const commonOptions = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { display: false }, y: { ticks: { color: "#888" }, grid: { color: "rgba(255,255,255,0.05)" } } }
+    };
+
+    const ctxBpm = document.getElementById('bpmChart').getContext('2d');
+    const bpmChart = new Chart(ctxBpm, {
+        type: 'line',
+        data: { labels: Array(20).fill(''), datasets: [{ label: 'BPM', data: [], borderColor: '#ff4b2b', tension: 0.4, fill: true, backgroundColor: 'rgba(255, 75, 43, 0.1)' }] },
+        options: commonOptions
+    });
+
+    const ctxSpo2 = document.getElementById('spo2Chart').getContext('2d');
+    const spo2Chart = new Chart(ctxSpo2, {
+        type: 'line',
+        data: { labels: Array(20).fill(''), datasets: [{ label: 'SpO2', data: [], borderColor: '#4facfe', tension: 0.4, fill: true, backgroundColor: 'rgba(79, 172, 254, 0.1)' }] },
+        options: commonOptions
+    });
+
+    // Lấy dữ liệu Realtime
+    database.ref('/suc_khoe/bpm').on('value', (s) => {
+        const val = s.val() || 0;
+        const el = document.getElementById('bpm_val');
+        el.innerHTML = val + ' <span class="unit">BPM</span>';
+        
+        // Cảnh báo đỏ nếu nhịp tim bất thường
+        if(val > 100 || (val < 50 && val > 0)) el.classList.add('alarm');
+        else el.classList.remove('alarm');
+
+        bpmChart.data.datasets[0].data.push(val);
+        if(bpmChart.data.datasets[0].data.length > 20) bpmChart.data.datasets[0].data.shift();
+        bpmChart.update();
+    });
+
+    database.ref('/suc_khoe/spo2').on('value', (s) => {
+        const val = s.val() || 0;
+        const el = document.getElementById('spo2_val');
+        el.innerHTML = val + ' <span class="unit">%</span>';
+        
+        if(val < 94 && val > 0) el.classList.add('alarm');
+        else el.classList.remove('alarm');
+
+        spo2Chart.data.datasets[0].data.push(val);
+        if(spo2Chart.data.datasets[0].data.length > 20) spo2Chart.data.datasets[0].data.shift();
+        spo2Chart.update();
+    });
+
+    setInterval(() => {
+        document.getElementById('time').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+</script>
+</body>
+</html>
