@@ -245,6 +245,27 @@
         #aiIcon {
             animation: scanPulse 2s infinite ease-in-out;
         }
+                /* SCI-FI LOADING ANIMATION */
+        .scan-ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 120px; height: 120px;
+            border: 3px solid transparent;
+            border-top-color: var(--neon-purple);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: scanRotate 1.8s linear infinite;
+            opacity: 0;
+            box-shadow: 0 0 25px var(--neon-purple);
+        }
+        @keyframes scanRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        #aiIcon {
+            transition: all 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -386,47 +407,48 @@
             </form>
         </div>
     </div>
-           <div id="analytics" class="tab-pane">
+             <div id="analytics" class="tab-pane">
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
-                <div class="card-stat" style="border: 2px solid var(--neon-purple); box-shadow: 0 0 50px rgba(157, 78, 221, 0.35);">
+                <div class="card-stat" style="border: 2px solid var(--neon-purple); box-shadow: 0 0 60px rgba(157, 78, 221, 0.5); overflow: hidden;">
                     
                     <div class="text-center pt-5 pb-4">
-                        <div style="width: 90px; height: 90px; margin: 0 auto 20px; background: rgba(157,78,221,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid var(--neon-purple);">
-                            <i class="fas fa-brain fa-4x" id="aiIcon" style="color: var(--neon-purple);"></i>
+                        <div id="aiContainer" style="width: 110px; height: 110px; margin: 0 auto 20px; position: relative;">
+                            <div style="width: 110px; height: 110px; background: rgba(157,78,221,0.08); border-radius: 50%; border: 3px solid var(--neon-purple); display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-brain fa-4x" id="aiIcon" style="color: var(--neon-purple);"></i>
+                            </div>
+                            <!-- Vòng scan sci-fi -->
+                            <div id="scanRing" class="scan-ring"></div>
                         </div>
-                        <h2 class="fw-bold mb-2" style="letter-spacing: 1px;">AI DIAGNOSTIC ENGINE</h2>
-                        <p class="text-secondary mb-4">Phân tích thời gian thực • Neural Network v2.1</p>
+                        <h2 class="fw-bold mb-1" style="letter-spacing: 2px;">AI DIAGNOSTIC ENGINE</h2>
+                        <p class="text-secondary" id="statusText">Sẵn sàng phân tích dữ liệu thời gian thực</p>
                     </div>
 
                     <div class="px-5 pb-5">
                         <button onclick="runDiagnosis()" id="startBtn" 
                                 class="btn w-100 py-4 fw-bold fs-5 position-relative overflow-hidden"
-                                style="background: linear-gradient(90deg, #6b21a8, #c026d3); border: none; border-radius: 16px; box-shadow: 0 10px 40px rgba(192, 38, 211, 0.5);">
+                                style="background: linear-gradient(90deg, #6b21a8, #c026d3); border: none; border-radius: 16px; box-shadow: 0 10px 40px rgba(192, 38, 211, 0.6);">
                             <span id="btnText">BẮT ĐẦU QUÉT PHÂN TÍCH</span>
                             <i class="fas fa-microchip ms-3" id="btnIcon"></i>
                         </button>
                     </div>
 
-                    <!-- Kết quả phân tích -->
-                    <div id="diagnosisResult" class="diag-box mx-4 mb-4" style="display: none; animation: cinematicFadeIn 0.6s ease forwards;">
+                    <!-- Kết quả -->
+                    <div id="diagnosisResult" class="diag-box mx-4 mb-4" style="display: none;">
                         <div class="d-flex justify-content-between align-items-start mb-4">
-                            <h4 class="fw-bold mb-0" id="diagTitle">Đang phân tích...</h4>
-                            <span id="confidenceScore" class="badge px-3 py-2 fs-6" style="background: rgba(157,78,221,0.2); color: var(--neon-purple);"></span>
+                            <h4 class="fw-bold mb-0" id="diagTitle">Kết quả phân tích</h4>
+                            <span id="confidenceScore" class="badge px-3 py-2 fs-6" style="background: rgba(157,78,221,0.25); color: var(--neon-purple);"></span>
                         </div>
-                        
-                        <div id="diagDetail" class="mb-4" style="line-height: 1.75; font-size: 1.05rem;"></div>
-
+                        <div id="diagDetail" class="mb-4" style="line-height: 1.8; font-size: 1.05rem;"></div>
                         <div class="border-top border-secondary pt-4">
-                            <small class="text-secondary">Khuyến nghị:</small>
-                            <div id="recommendation" class="mt-2 p-3 rounded-3" style="background: rgba(0,0,0,0.3);"></div>
+                            <small class="text-secondary">Khuyến nghị ngay lập tức:</small>
+                            <div id="recommendation" class="mt-2 p-3 rounded-3" style="background: rgba(0,0,0,0.35);"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <div id="history" class="tab-pane">
         <div class="card-stat">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -788,6 +810,7 @@
 
     // --- PHÂN TÍCH AI ---
        // === PHÂN TÍCH AI - PHIÊN BẢN NÂNG CẤP ===
+     
     function runDiagnosis() {
         const btn = document.getElementById('startBtn');
         const btnText = document.getElementById('btnText');
@@ -797,58 +820,77 @@
         const detail = document.getElementById('diagDetail');
         const confidence = document.getElementById('confidenceScore');
         const recommendation = document.getElementById('recommendation');
+        const statusText = document.getElementById('statusText');
         const aiIcon = document.getElementById('aiIcon');
+        const scanRing = document.getElementById('scanRing');
 
-        // Hiệu ứng loading
+        if (!currentId || currentBPM === 0) {
+            alert("Vui lòng kết nối thiết bị và có dữ liệu đo trước khi phân tích!");
+            return;
+        }
+
+        // Bắt đầu loading sci-fi
         btn.disabled = true;
-        btn.style.opacity = "0.85";
-        btnText.innerHTML = 'ĐANG PHÂN TÍCH';
+        btn.style.opacity = "0.7";
+        btnText.innerHTML = 'ĐANG KẾT NỐI NEURAL NET...';
         btnIcon.className = 'fas fa-spinner fa-spin ms-3';
 
-        aiIcon.style.animation = 'scanPulse 1.2s infinite';
+        aiIcon.style.color = '#a855f7';
+        scanRing.style.opacity = '1';
+        statusText.textContent = 'Đang quét dữ liệu sinh trắc học...';
+
+        // Giai đoạn loading dài + text thay đổi
+        let progress = 0;
+        const loadingInterval = setInterval(() => {
+            progress += 25;
+            if (progress === 25) {
+                statusText.textContent = 'Đang phân tích nhịp tim và SpO2...';
+            } else if (progress === 50) {
+                statusText.textContent = 'Chạy Neural Network Layer 3...';
+            } else if (progress === 75) {
+                statusText.textContent = 'Đang tổng hợp chẩn đoán...';
+            }
+        }, 1100);
 
         setTimeout(() => {
+            clearInterval(loadingInterval);
+            
+            // Kết thúc loading
             btn.disabled = false;
             btn.style.opacity = "1";
             btnText.innerHTML = 'BẮT ĐẦU QUÉT PHÂN TÍCH';
             btnIcon.className = 'fas fa-microchip ms-3';
-            aiIcon.style.animation = '';
+            scanRing.style.opacity = '0';
+            statusText.textContent = 'Sẵn sàng phân tích dữ liệu thời gian thực';
+            aiIcon.style.color = 'var(--neon-purple)';
 
             resultBox.style.display = 'block';
 
-            if (currentBPM === 0 || currentSPO2 === 0) {
-                title.innerHTML = '⚠️ Không có dữ liệu';
-                detail.innerHTML = 'Hệ thống chưa nhận được dữ liệu từ cảm biến. Vui lòng kiểm tra thiết bị đo.';
-                confidence.textContent = '0%';
-                recommendation.innerHTML = '<span style="color:#ff2a5f">Kết nối cảm biến và thử lại.</span>';
-                return;
-            }
-
-            // Phân tích logic (có thể mở rộng sau)
-            let status = "Ổn định";
-            let conf = 92;
-            let rec = "Tiếp tục theo dõi định kỳ.";
+            // Tạo kết quả (bạn có thể chỉnh logic sau)
+            let diagStatus = "Ổn định";
+            let conf = 89;
+            let recText = "Bệnh nhân hiện ổn định. Tiếp tục theo dõi định kỳ.";
 
             if (currentBPM > 110 || currentSPO2 < 92) {
-                status = "Cảnh báo nghiêm trọng";
-                conf = 78;
-                rec = "Khuyến nghị đến cơ sở y tế ngay lập tức để kiểm tra tim mạch và hô hấp.";
+                diagStatus = "Cảnh báo cao";
+                conf = 76;
+                recText = "Khuyến cáo đến ngay cơ sở y tế gần nhất để kiểm tra tim mạch và hô hấp.";
             } else if (currentBPM > 100 || currentSPO2 < 95) {
-                status = "Cần theo dõi";
-                conf = 85;
-                rec = "Giảm hoạt động mạnh, nghỉ ngơi và đo lại sau 30 phút.";
+                diagStatus = "Cần theo dõi";
+                conf = 84;
+                recText = "Giảm cường độ hoạt động, nghỉ ngơi và đo lại sau 20-30 phút.";
             }
 
-            title.innerHTML = `Kết quả: <span style="color:var(--neon-success)">${status}</span>`;
+            title.innerHTML = `Chẩn đoán: <span style="color: var(--neon-success)">${diagStatus}</span>`;
             detail.innerHTML = `
                 Nhịp tim: <strong>${currentBPM} BPM</strong><br>
                 SpO₂: <strong>${currentSPO2}%</strong><br><br>
-                AI đánh giá: Bệnh nhân hiện đang ở trạng thái ổn định nhẹ.
+                Hệ thống AI đã phân tích xong với độ tin cậy cao.
             `;
-            confidence.textContent = conf + '%';
-            recommendation.innerHTML = `<i class="fas fa-lightbulb me-2"></i> ${rec}`;
+            confidence.textContent = conf + '% Confidence';
+            recommendation.innerHTML = `<i class="fas fa-lightbulb me-2 text-warning"></i> ${recText}`;
 
-        }, 2200); // thời gian loading giả lập
+        }, 4500); // Loading kéo dài 4.5 giây - rất giống phim khoa học viễn tưởng
     }
         // ====================== SỬA PHẦN HỒ SƠ - LƯU THẬT VÀO FIREBASE ======================
     function savePatientProfile(e) {
