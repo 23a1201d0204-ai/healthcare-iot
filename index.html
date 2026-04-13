@@ -367,9 +367,42 @@
         // (toàn bộ hàm initCharts của code gốc)
         if (bpmChart) bpmChart.destroy();
         if (spo2Chart) spo2Chart.destroy();
-        // ... (copy nguyên phần initCharts từ code gốc của bạn)
-    }
+      const ctxBpm = document.getElementById('bpmChart').getContext('2d');
+        const gradBpm = ctxBpm.createLinearGradient(0, 0, 0, 200);
+        gradBpm.addColorStop(0, 'rgba(255, 42, 95, 0.4)');
+        gradBpm.addColorStop(1, 'rgba(255, 42, 95, 0.01)');
 
+        const ctxSpo2 = document.getElementById('spo2Chart').getContext('2d');
+        const gradSpo2 = ctxSpo2.createLinearGradient(0, 0, 0, 200);
+        gradSpo2.addColorStop(0, 'rgba(0, 229, 255, 0.4)');
+        gradSpo2.addColorStop(1, 'rgba(0, 229, 255, 0.01)');
+
+        const commonOptions = { 
+            responsive: true, maintainAspectRatio: false, plugins: { legend: false, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(20,20,29,0.9)', titleColor: '#00e5ff', borderColor: '#232332', borderWidth: 1 } }, 
+            scales: { 
+                x: { display: false }, 
+                y: { grid: { color: "rgba(255,255,255,0.03)", drawBorder: false }, suggestedMin: 40, suggestedMax: 120 } 
+            },
+            elements: { line: { tension: 0.45 }, point: { radius: 0, hoverRadius: 8, hitRadius: 10 } },
+            animation: { duration: 600, easing: 'easeOutQuart' }
+        };
+
+        bpmChart = new Chart(ctxBpm, { 
+            type: 'line', 
+            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#ff2a5f', backgroundColor: gradBpm, borderWidth: 4, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#ff2a5f', pointBorderWidth: 2 }] }, 
+            options: commonOptions 
+        });
+
+        const spo2Options = JSON.parse(JSON.stringify(commonOptions));
+        spo2Options.scales.y.suggestedMin = 80;
+        spo2Options.scales.y.suggestedMax = 100;
+
+        spo2Chart = new Chart(ctxSpo2, { 
+            type: 'line', 
+            data: { labels: Array(20).fill(''), datasets: [{ data: [], borderColor: '#00e5ff', backgroundColor: gradSpo2, borderWidth: 4, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#00e5ff', pointBorderWidth: 2 }] }, 
+            options: spo2Options 
+        });
+    }
     function accessSystem() {
         const input = document.getElementById('deviceIdInput').value.trim();
         if(!input) return alert("Vui lòng nhập ID thiết bị (Ví dụ: ESP8266_01)!");
