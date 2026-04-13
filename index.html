@@ -58,7 +58,7 @@
         .sidebar.collapsed { width: 85px; } 
         .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text { opacity: 0; pointer-events: none; display: none; }
         
-        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;}
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; overflow: hidden;}
         .toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
         .toggle-btn:hover { color: var(--neon-spo2); text-shadow: var(--glow-spo2); transform: scale(1.1); }
         
@@ -143,6 +143,83 @@
         ::-webkit-scrollbar-track { background: var(--bg-body); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--neon-spo2); }
+
+        /* --- GIAO DIỆN TIN TỨC --- */
+        .news-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.4s var(--smooth-ease);
+            cursor: pointer;
+            height: 100%;
+        }
+        .news-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.15);
+        }
+        .news-img-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+        .news-img {
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.6s var(--smooth-ease);
+        }
+        .news-card:hover .news-img {
+            transform: scale(1.08);
+        }
+        .featured-news .news-img { height: 350px; }
+        .sub-news .news-img { height: 160px; }
+        .news-content { padding: 20px; }
+        .news-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            transition: 0.3s;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-card:hover .news-title { color: var(--neon-spo2); }
+        .news-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .news-banner {
+            background: linear-gradient(145deg, #0a192f, #020c1b);
+            border: 1px solid var(--neon-spo2);
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: inset 0 0 20px rgba(0,229,255,0.1);
+        }
+        .news-list-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .news-list-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; }
+        .news-list-item:last-child { border-bottom: none; }
+
+        /* --- FIX LỖI NÚT 3 GẠCH BỊ LÒI KHI THU GỌN SIDEBAR --- */
+        .sidebar.collapsed .sidebar-header {
+            padding: 25px 0;
+            justify-content: center;
+        }
+        .sidebar.collapsed .toggle-btn {
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -170,6 +247,7 @@
         <div class="nav-link" onclick="switchMenu('analytics', this)"><i class="fas fa-brain nav-icon"></i> <span class="nav-text">Phân Tích Bệnh Lý</span></div>
         <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-chart-gantt nav-icon"></i> <span class="nav-text">Lịch Sử Đo Lường</span></div>
         <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-triangle-exclamation nav-icon"></i> <span class="nav-text">Nhật Ký Cảnh Báo</span></div>
+        <div class="nav-link" onclick="switchMenu('news', this)"><i class="fas fa-newspaper nav-icon"></i> <span class="nav-text">Tin Tức Y Tế</span></div>
     </div>
 </div>
 
@@ -320,6 +398,80 @@
         </div>
     </div>
 
+    <div id="news" class="tab-pane">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold m-0"><i class="fas fa-globe me-2" style="color: var(--neon-spo2);"></i> Tin Tức Sức Khỏe & Y Tế</h4>
+            <span class="text-secondary small">Cập nhật lúc: <script>document.write(new Date().toLocaleDateString('vi-VN'))</script></span>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="news-card featured-news mb-4">
+                    <div class="news-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=1000" class="news-img" alt="Tin chinh">
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-3" style="box-shadow: var(--glow-hr)">NỔI BẬT</span>
+                    </div>
+                    <div class="news-content">
+                        <h3 class="news-title">Đột phá mới: AI phát hiện sớm dấu hiệu rối loạn nhịp tim qua dữ liệu thiết bị đeo thông minh</h3>
+                        <p class="news-desc">Nghiên cứu mới nhất cho thấy hệ thống trí tuệ nhân tạo có thể phân tích dữ liệu từ các thiết bị đo nhịp tim liên tục (như Med-Core) để dự báo chính xác nguy cơ nhồi máu cơ tim trước 48 giờ...</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="news-card sub-news">
+                            <div class="news-img-wrapper">
+                                <img src="https://images.unsplash.com/photo-1551076805-e1869043e560?auto=format&fit=crop&q=80&w=500" class="news-img" alt="Tin phu">
+                            </div>
+                            <div class="news-content">
+                                <h5 class="news-title">5 Dấu hiệu cảnh báo nồng độ Oxy trong máu (SpO2) đang tụt dốc</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="news-card sub-news">
+                            <div class="news-img-wrapper">
+                                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=500" class="news-img" alt="Tin phu">
+                            </div>
+                            <div class="news-content">
+                                <h5 class="news-title">Người tăng huyết áp có nên uống trà đặc mỗi ngày? Lời khuyên từ chuyên gia</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="news-banner mb-4">
+                    <i class="fas fa-shield-heart fa-3x mb-3" style="color: var(--neon-spo2); filter: drop-shadow(var(--glow-spo2));"></i>
+                    <h4 class="text-white fw-bold mb-2">TẦM SOÁT TIM MẠCH AI</h4>
+                    <p class="text-secondary small mb-4">Phát hiện sớm bất thường nhịp tim với độ chính xác cao nhờ hệ thống thuật toán MED-CORE PRO.</p>
+                    <button class="btn btn-outline-info w-100 rounded-pill" onclick="switchMenu('analytics', document.querySelectorAll('.nav-link')[2])">Phân tích ngay</button>
+                </div>
+
+                <div class="card-stat p-0 overflow-hidden">
+                    <div class="p-3 border-bottom" style="border-color: var(--border-color)!important">
+                        <h6 class="fw-bold m-0 text-white"><i class="fas fa-fire me-2 text-warning"></i> ĐỌC NHIỀU NHẤT</h6>
+                    </div>
+                    <div class="p-3">
+                        <div class="news-list-item">
+                            <span class="text-secondary fw-bold fs-5">01</span>
+                            <div><h6 class="news-title fs-6 mb-1">Chóng mặt khi tắm nước nóng có phải dấu hiệu bệnh tim?</h6></div>
+                        </div>
+                        <div class="news-list-item">
+                            <span class="text-secondary fw-bold fs-5">02</span>
+                            <div><h6 class="news-title fs-6 mb-1">Đốt điện chữa rối loạn nhịp tim: Ưu nhược điểm</h6></div>
+                        </div>
+                        <div class="news-list-item">
+                            <span class="text-secondary fw-bold fs-5">03</span>
+                            <div><h6 class="news-title fs-6 mb-1">Kiểm soát cholesterol từ những thói quen đơn giản</h6></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -370,7 +522,7 @@
     style.innerHTML = `@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`;
     document.head.appendChild(style);
 
-    // --- FIREBASE & CHART LOGIC (Giữ nguyên như cũ, chỉ làm đẹp Chart) ---
+    // --- FIREBASE & CHART LOGIC ---
     const firebaseConfig = {
         apiKey: "AIzaSyBiDaQIash5NR2nH8FhQa56jj3OqxPM210",
         authDomain: "doan2-cdeec.firebaseapp.com",
