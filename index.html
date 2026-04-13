@@ -54,12 +54,36 @@
         .btn-medical:hover { filter: brightness(1.2); transform: translateY(-3px) scale(1.02); color: #000; box-shadow: 0 10px 25px rgba(0, 229, 255, 0.6); }
 
         /* BỐ CỤC & SIDEBAR ĐÓNG MỞ */
-        .sidebar { background: rgba(16, 16, 22, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; transition: width 0.4s var(--smooth-ease); z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+        .sidebar { background: rgba(16, 16, 22, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; transition: width 0.4s var(--smooth-ease); z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.5); overflow: hidden; }
         .sidebar.collapsed { width: 85px; } 
         .sidebar.collapsed .nav-text, .sidebar.collapsed .logo-text { opacity: 0; pointer-events: none; display: none; }
         
-        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; overflow: hidden;}
-        .toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.2rem; transition: 0.3s; }
+        /* FIX LỖI MẤT NÚT 3 GẠCH Ở ĐÂY */
+        .sidebar-header { 
+            height: 80px; 
+            padding: 0 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            transition: padding 0.4s var(--smooth-ease);
+        }
+        .sidebar.collapsed .sidebar-header {
+            padding: 0;
+            justify-content: center;
+        }
+        .toggle-btn { 
+            background: none; 
+            border: none; 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            font-size: 1.4rem; 
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s; 
+        }
         .toggle-btn:hover { color: var(--neon-spo2); text-shadow: var(--glow-spo2); transform: scale(1.1); }
         
         /* HIỆU ỨNG NAV LINK CỰC ĐẸP */
@@ -111,14 +135,8 @@
 
         /* HIỆU ỨNG CHUYỂN TAB CỰC MƯỢT (BLUR + SCALE) */
         .tab-pane { display: none; opacity: 0; }
-        .tab-pane.active { 
-            display: block; 
-            animation: cinematicFadeIn 0.6s var(--smooth-ease) forwards; 
-        }
-        @keyframes cinematicFadeIn { 
-            0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(8px); } 
-            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } 
-        }
+        .tab-pane.active { display: block; animation: cinematicFadeIn 0.6s var(--smooth-ease) forwards; }
+        @keyframes cinematicFadeIn { 0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(8px); } 100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
 
         /* HEADER THÔNG TIN */
         .patient-header { background: linear-gradient(120deg, var(--bg-card), #12121a); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
@@ -211,15 +229,6 @@
         }
         .news-list-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; }
         .news-list-item:last-child { border-bottom: none; }
-
-        /* --- FIX LỖI NÚT 3 GẠCH BỊ LÒI KHI THU GỌN SIDEBAR --- */
-        .sidebar.collapsed .sidebar-header {
-            padding: 25px 0;
-            justify-content: center;
-        }
-        .sidebar.collapsed .toggle-btn {
-            margin: 0 auto;
-        }
     </style>
 </head>
 <body>
@@ -406,7 +415,7 @@
 
         <div class="row g-4">
             <div class="col-lg-8">
-                <div class="news-card featured-news mb-4">
+                <div class="news-card featured-news mb-4" onclick="window.open('https://vnexpress.net/suc-khoe/benh-tim-mach', '_blank')">
                     <div class="news-img-wrapper">
                         <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=1000" class="news-img" alt="Tin chinh">
                         <span class="badge bg-danger position-absolute top-0 start-0 m-3" style="box-shadow: var(--glow-hr)">NỔI BẬT</span>
@@ -419,7 +428,7 @@
 
                 <div class="row g-4">
                     <div class="col-md-6">
-                        <div class="news-card sub-news">
+                        <div class="news-card sub-news" onclick="window.open('https://vnexpress.net/suc-khoe', '_blank')">
                             <div class="news-img-wrapper">
                                 <img src="https://images.unsplash.com/photo-1551076805-e1869043e560?auto=format&fit=crop&q=80&w=500" class="news-img" alt="Tin phu">
                             </div>
@@ -429,7 +438,7 @@
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="news-card sub-news">
+                        <div class="news-card sub-news" onclick="window.open('https://vnexpress.net/suc-khoe/dinh-duong', '_blank')">
                             <div class="news-img-wrapper">
                                 <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=500" class="news-img" alt="Tin phu">
                             </div>
@@ -454,15 +463,15 @@
                         <h6 class="fw-bold m-0 text-white"><i class="fas fa-fire me-2 text-warning"></i> ĐỌC NHIỀU NHẤT</h6>
                     </div>
                     <div class="p-3">
-                        <div class="news-list-item">
+                        <div class="news-list-item" onclick="window.open('https://vnexpress.net/chong-mat-khi-tam-nuoc-nong-co-phai-dau-hieu-benh-tim-4731830.html', '_blank')">
                             <span class="text-secondary fw-bold fs-5">01</span>
                             <div><h6 class="news-title fs-6 mb-1">Chóng mặt khi tắm nước nóng có phải dấu hiệu bệnh tim?</h6></div>
                         </div>
-                        <div class="news-list-item">
+                        <div class="news-list-item" onclick="window.open('https://vnexpress.net/dot-dien-chua-roi-loan-nhip-tim-uu-nhuoc-diem-4731215.html', '_blank')">
                             <span class="text-secondary fw-bold fs-5">02</span>
                             <div><h6 class="news-title fs-6 mb-1">Đốt điện chữa rối loạn nhịp tim: Ưu nhược điểm</h6></div>
                         </div>
-                        <div class="news-list-item">
+                        <div class="news-list-item" onclick="window.open('https://vnexpress.net/kiem-soat-cholesterol-tu-nhung-thoi-quen-don-gian-4730102.html', '_blank')">
                             <span class="text-secondary fw-bold fs-5">03</span>
                             <div><h6 class="news-title fs-6 mb-1">Kiểm soát cholesterol từ những thói quen đơn giản</h6></div>
                         </div>
@@ -477,17 +486,14 @@
 <script>
     // --- UI LOGIC ---
     function switchMenu(tabId, element) {
-        // Chỉ chạy nếu bấm vào tab khác tab hiện tại
         if(element.classList.contains('active')) return;
 
-        // Xóa active cũ
         document.querySelectorAll('.tab-pane').forEach(el => {
             el.classList.remove('active');
-            el.style.animation = 'none'; // reset animation
-            el.offsetHeight; /* trigger reflow */
+            el.style.animation = 'none'; 
+            el.offsetHeight; 
         });
         
-        // Thêm active mới và kích hoạt animation
         const targetTab = document.getElementById(tabId);
         targetTab.classList.add('active');
         targetTab.style.animation = null;
@@ -510,14 +516,12 @@
     }
 
     setInterval(() => { 
-        // Hiệu ứng nhấp nháy cho dấu hai chấm của đồng hồ
         const now = new Date();
         const timeStr = now.toLocaleTimeString('vi-VN').replace(/:/g, '<span style="animation: pulse 1s infinite;">:</span>');
         const dateStr = now.toLocaleDateString('vi-VN');
         document.getElementById('realtimeClock').innerHTML = `<i class="far fa-clock me-2" style="color: var(--neon-spo2)"></i> ${timeStr} | ${dateStr}`; 
     }, 1000);
 
-    // Thêm CSS nhấp nháy vào JS cho gọn
     const style = document.createElement('style');
     style.innerHTML = `@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`;
     document.head.appendChild(style);
@@ -541,7 +545,6 @@
     Chart.defaults.font.family = 'Segoe UI';
 
     function initCharts() {
-        // Khởi tạo gradient cho biểu đồ
         const ctxBpm = document.getElementById('bpmChart').getContext('2d');
         const gradBpm = ctxBpm.createLinearGradient(0, 0, 0, 200);
         gradBpm.addColorStop(0, 'rgba(255, 42, 95, 0.4)');
@@ -584,7 +587,6 @@
         if(!input) return alert("Vui lòng nhập ID thiết bị (Ví dụ: ESP8266_01)!");
         currentId = input;
         
-        // Hiệu ứng biến mất khung Login mượt mà
         document.getElementById('login-overlay').style.opacity = "0";
         setTimeout(() => {
             document.getElementById('login-overlay').style.visibility = "hidden";
