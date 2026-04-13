@@ -386,49 +386,42 @@
             </form>
         </div>
     </div>
-       <div id="analytics" class="tab-pane">
+           <div id="analytics" class="tab-pane">
         <div class="row justify-content-center">
-            <div class="col-lg-9">
-                <div class="card-stat" style="border-top: 5px solid var(--neon-purple); box-shadow: 0 0 40px rgba(157, 78, 221, 0.4);">
+            <div class="col-lg-10 col-xl-8">
+                <div class="card-stat" style="border: 2px solid var(--neon-purple); box-shadow: 0 0 50px rgba(157, 78, 221, 0.35);">
                     
-                    <!-- Header AI -->
-                    <div class="text-center py-4">
-                        <div class="d-inline-flex align-items-center justify-content-center mb-3" 
-                             style="width: 80px; height: 80px; background: rgba(157,78,221,0.15); border-radius: 50%; border: 3px solid var(--neon-purple);">
-                            <i class="fas fa-brain fa-3x" id="aiIcon" style="color: var(--neon-purple); filter: drop-shadow(0 0 20px var(--neon-purple));"></i>
+                    <div class="text-center pt-5 pb-4">
+                        <div style="width: 90px; height: 90px; margin: 0 auto 20px; background: rgba(157,78,221,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid var(--neon-purple);">
+                            <i class="fas fa-brain fa-4x" id="aiIcon" style="color: var(--neon-purple);"></i>
                         </div>
-                        <h2 class="fw-bold text-white mb-1">AI DIAGNOSTIC ENGINE</h2>
-                        <p class="text-secondary mb-0" style="font-size: 1.05rem;">
-                            Phân tích thời gian thực • Neural Network v2.1
-                        </p>
+                        <h2 class="fw-bold mb-2" style="letter-spacing: 1px;">AI DIAGNOSTIC ENGINE</h2>
+                        <p class="text-secondary mb-4">Phân tích thời gian thực • Neural Network v2.1</p>
                     </div>
 
-                    <!-- Nút bắt đầu -->
-                    <div class="d-grid gap-2 px-5 pb-5">
+                    <div class="px-5 pb-5">
                         <button onclick="runDiagnosis()" id="startBtn" 
-                                class="btn py-4 fw-bold fs-5 position-relative overflow-hidden"
-                                style="background: linear-gradient(90deg, #5a189a, var(--neon-purple)); 
-                                       border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(157,78,221,0.5);">
+                                class="btn w-100 py-4 fw-bold fs-5 position-relative overflow-hidden"
+                                style="background: linear-gradient(90deg, #6b21a8, #c026d3); border: none; border-radius: 16px; box-shadow: 0 10px 40px rgba(192, 38, 211, 0.5);">
                             <span id="btnText">BẮT ĐẦU QUÉT PHÂN TÍCH</span>
-                            <i class="fas fa-microchip ms-2" id="btnIcon"></i>
+                            <i class="fas fa-microchip ms-3" id="btnIcon"></i>
                         </button>
                     </div>
 
-                    <!-- Kết quả -->
-                    <div id="diagnosisResult" class="diag-box mt-3 mx-4" style="display: none;">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h4 class="fw-bold mb-0" id="diagTitle">Kết quả phân tích</h4>
-                            <span id="confidenceScore" class="badge bg-purple px-3 py-2 fs-6"></span>
+                    <!-- Kết quả phân tích -->
+                    <div id="diagnosisResult" class="diag-box mx-4 mb-4" style="display: none; animation: cinematicFadeIn 0.6s ease forwards;">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <h4 class="fw-bold mb-0" id="diagTitle">Đang phân tích...</h4>
+                            <span id="confidenceScore" class="badge px-3 py-2 fs-6" style="background: rgba(157,78,221,0.2); color: var(--neon-purple);"></span>
                         </div>
                         
-                        <div id="diagDetail" class="text-white fs-5" style="line-height: 1.8;"></div>
+                        <div id="diagDetail" class="mb-4" style="line-height: 1.75; font-size: 1.05rem;"></div>
 
-                        <div class="mt-5 pt-4 border-top border-secondary">
-                            <div class="text-secondary small mb-2">Khuyến nghị ngay lập tức</div>
-                            <div id="recommendation" class="alert alert-dark border-0" style="border-radius: 12px;"></div>
+                        <div class="border-top border-secondary pt-4">
+                            <small class="text-secondary">Khuyến nghị:</small>
+                            <div id="recommendation" class="mt-2 p-3 rounded-3" style="background: rgba(0,0,0,0.3);"></div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -794,78 +787,68 @@
     }
 
     // --- PHÂN TÍCH AI ---
+       // === PHÂN TÍCH AI - PHIÊN BẢN NÂNG CẤP ===
     function runDiagnosis() {
-        const icon = document.getElementById('diagIcon');
-        const btn = icon.parentElement;
-        const box = document.getElementById('diagnosisResult');
+        const btn = document.getElementById('startBtn');
+        const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
+        const resultBox = document.getElementById('diagnosisResult');
         const title = document.getElementById('diagTitle');
         const detail = document.getElementById('diagDetail');
-        
-        btn.style.transform = "scale(0.95)";
-        setTimeout(() => btn.style.transform = "scale(1)", 150);
+        const confidence = document.getElementById('confidenceScore');
+        const recommendation = document.getElementById('recommendation');
+        const aiIcon = document.getElementById('aiIcon');
 
-        icon.classList.remove('fa-microchip');
-        icon.classList.add('fa-spinner', 'fa-spin');
-        box.style.display = 'none';
+        // Hiệu ứng loading
+        btn.disabled = true;
+        btn.style.opacity = "0.85";
+        btnText.innerHTML = 'ĐANG PHÂN TÍCH';
+        btnIcon.className = 'fas fa-spinner fa-spin ms-3';
+
+        aiIcon.style.animation = 'scanPulse 1.2s infinite';
 
         setTimeout(() => {
-            icon.classList.remove('fa-spinner', 'fa-spin');
-            icon.classList.add('fa-microchip');
-            box.style.display = 'block';
-            
-            box.classList.remove('diag-safe', 'diag-warn', 'diag-danger');
+            btn.disabled = false;
+            btn.style.opacity = "1";
+            btnText.innerHTML = 'BẮT ĐẦU QUÉT PHÂN TÍCH';
+            btnIcon.className = 'fas fa-microchip ms-3';
+            aiIcon.style.animation = '';
+
+            resultBox.style.display = 'block';
 
             if (currentBPM === 0 || currentSPO2 === 0) {
-                box.classList.add('diag-warn');
-                title.innerHTML = '<i class="fas fa-triangle-exclamation"></i> KẾT NỐI DATA THẤT BẠI';
-                detail.innerHTML = "Hệ thống AI không nhận được luồng dữ liệu thời gian thực. Bệnh nhân có thể chưa tiếp xúc với cảm biến quang học hoặc Module thu phát sóng gặp sự cố.";
+                title.innerHTML = '⚠️ Không có dữ liệu';
+                detail.innerHTML = 'Hệ thống chưa nhận được dữ liệu từ cảm biến. Vui lòng kiểm tra thiết bị đo.';
+                confidence.textContent = '0%';
+                recommendation.innerHTML = '<span style="color:#ff2a5f">Kết nối cảm biến và thử lại.</span>';
                 return;
             }
 
-            let diagnosisArr = [];
-            let isDanger = false;
-            let isWarn = false;
+            // Phân tích logic (có thể mở rộng sau)
+            let status = "Ổn định";
+            let conf = 92;
+            let rec = "Tiếp tục theo dõi định kỳ.";
 
-            if (currentSPO2 >= 95) {
-                diagnosisArr.push("<i class='fas fa-check text-success me-2'></i><span style='color: var(--neon-spo2)'>Oxy Máu (SpO2):</span> Chỉ số bão hòa oxy tối ưu. Phổi trao đổi khí hiệu quả.");
-            } else if (currentSPO2 >= 90) {
-                isWarn = true;
-                diagnosisArr.push("<i class='fas fa-exclamation text-warning me-2'></i><span style='color: var(--neon-warning)'>Oxy Máu (SpO2):</span> Cảnh báo Mild Hypoxemia. Cần chú ý độ thoáng khí khu vực nghỉ ngơi.");
-            } else {
-                isDanger = true;
-                diagnosisArr.push("<i class='fas fa-skull text-danger me-2'></i><b style='color: var(--neon-hr); text-shadow: var(--glow-hr)'>Oxy Máu (SpO2):</b> Báo động Hypoxia! Nguy cơ hoại tử tế bào não do thiếu oxy cấp tính. Yêu cầu bình oxy dự phòng.");
+            if (currentBPM > 110 || currentSPO2 < 92) {
+                status = "Cảnh báo nghiêm trọng";
+                conf = 78;
+                rec = "Khuyến nghị đến cơ sở y tế ngay lập tức để kiểm tra tim mạch và hô hấp.";
+            } else if (currentBPM > 100 || currentSPO2 < 95) {
+                status = "Cần theo dõi";
+                conf = 85;
+                rec = "Giảm hoạt động mạnh, nghỉ ngơi và đo lại sau 30 phút.";
             }
 
-            if (currentBPM >= 60 && currentBPM <= 100) {
-                diagnosisArr.push("<i class='fas fa-check text-success me-2'></i><span style='color: var(--neon-spo2)'>Nhịp Tim (HR):</span> Tần số tim xoang hoàn toàn ổn định.");
-            } else if (currentBPM > 100 && currentBPM <= 120) {
-                isWarn = true;
-                diagnosisArr.push("<i class='fas fa-exclamation text-warning me-2'></i><span style='color: var(--neon-warning)'>Nhịp Tim (HR):</span> Nhịp nhanh thể nhẹ. Có thể do sốt, căng thẳng hoặc phản ứng thuốc.");
-            } else if (currentBPM > 120) {
-                isDanger = true;
-                diagnosisArr.push("<i class='fas fa-skull text-danger me-2'></i><b style='color: var(--neon-hr); text-shadow: var(--glow-hr)'>Nhịp Tim (HR):</b> Rung nhĩ cấp/Tachycardia nghiêm trọng. Cần đo ECG ngay lập tức.");
-            } else if (currentBPM < 60 && currentBPM > 40) {
-                isWarn = true;
-                diagnosisArr.push("<i class='fas fa-exclamation text-warning me-2'></i><span style='color: var(--neon-warning)'>Nhịp Tim (HR):</span> Bradycardia sinh lý. Bình thường ở người tập thể thao, cần hỏi lại tiền sử.");
-            } else {
-                isDanger = true;
-                diagnosisArr.push("<i class='fas fa-skull text-danger me-2'></i><b style='color: var(--neon-hr); text-shadow: var(--glow-hr)'>Nhịp Tim (HR):</b> Suy nút xoang nghiêm trọng. Nguy cơ máu không bơm đủ lên não gây ngất.");
-            }
+            title.innerHTML = `Kết quả: <span style="color:var(--neon-success)">${status}</span>`;
+            detail.innerHTML = `
+                Nhịp tim: <strong>${currentBPM} BPM</strong><br>
+                SpO₂: <strong>${currentSPO2}%</strong><br><br>
+                AI đánh giá: Bệnh nhân hiện đang ở trạng thái ổn định nhẹ.
+            `;
+            confidence.textContent = conf + '%';
+            recommendation.innerHTML = `<i class="fas fa-lightbulb me-2"></i> ${rec}`;
 
-            detail.innerHTML = diagnosisArr.join("<br><br>");
-
-            if (isDanger) {
-                box.classList.add('diag-danger');
-                title.innerHTML = '<i class="fas fa-siren-on fa-beat-fade" style="color: var(--neon-hr)"></i> CẢNH BÁO LÂM SÀNG NGHIÊM TRỌNG';
-            } else if (isWarn) {
-                box.classList.add('diag-warn');
-                title.innerHTML = '<i class="fas fa-magnifying-glass-chart" style="color: var(--neon-warning)"></i> CHỈ ĐỊNH THEO DÕI Y TẾ';
-            } else {
-                box.classList.add('diag-safe');
-                title.innerHTML = '<i class="fas fa-shield-check" style="color: var(--neon-success)"></i> BÁO CÁO: HOÀN TOÀN KHỎE MẠNH';
-            }
-
-        }, 1800); 
+        }, 2200); // thời gian loading giả lập
     }
         // ====================== SỬA PHẦN HỒ SƠ - LƯU THẬT VÀO FIREBASE ======================
     function savePatientProfile(e) {
