@@ -332,38 +332,44 @@
         </div>
     </div>
 
-    <div id="patient" class="tab-pane">
+      <div id="patient" class="tab-pane">
         <div class="card-stat">
-            <h4 class="fw-bold mb-4"><i class="fas fa-address-card me-2" style="color: var(--neon-spo2);"></i> Quản lý Hồ sơ</h4>
-            <form id="patientForm" onsubmit="savePatient(event)">
+            <h4 class="fw-bold mb-4"><i class="fas fa-address-card me-2" style="color: var(--neon-spo2);"></i> Quản lý Hồ sơ Bệnh Nhân</h4>
+            <form id="patientForm" onsubmit="savePatientProfile(event)">
                 <div class="row g-4">
                     <div class="col-md-6">
                         <label class="text-secondary mb-2">Họ và tên Bệnh nhân</label>
-                        <input type="text" class="form-control form-control-neon" id="pName" value="Nguyễn Văn A" required>
+                        <input type="text" class="form-control form-control-neon" id="pName" required>
                     </div>
                     <div class="col-md-3">
                         <label class="text-secondary mb-2">Tuổi</label>
-                        <input type="number" class="form-control form-control-neon" id="pAge" value="45">
+                        <input type="number" class="form-control form-control-neon" id="pAge">
                     </div>
                     <div class="col-md-3">
                         <label class="text-secondary mb-2">Nhóm máu</label>
                         <select class="form-select form-control-neon" id="pBlood">
-                            <option value="O+">O+</option><option value="A+">A+</option><option value="B+">B+</option><option value="AB+">AB+</option>
+                            <option value="O+">O+</option>
+                            <option value="A+">A+</option>
+                            <option value="B+">B+</option>
+                            <option value="AB+">AB+</option>
                         </select>
                     </div>
                     <div class="col-12">
                         <label class="text-secondary mb-2">Tiền sử bệnh lý / Ghi chú y khoa</label>
-                        <textarea class="form-control form-control-neon" rows="4" id="pHistory">Đang theo dõi rối loạn nhịp tim. Bệnh nhân có tiền sử tăng huyết áp vô căn.</textarea>
+                        <textarea class="form-control form-control-neon" rows="4" id="pHistory"></textarea>
                     </div>
                     <div class="col-12 mt-4 text-end">
-                        <span id="saveStatus" class="me-3 text-success fw-bold" style="display:none; text-shadow: var(--glow-success);"><i class="fas fa-check-double"></i> Đã đồng bộ lên Cloud!</span>
-                        <button type="submit" class="btn btn-outline-info px-4 py-2" style="border-color: var(--neon-spo2); color: var(--neon-spo2); border-radius: 10px; transition: 0.3s;"><i class="fas fa-cloud-arrow-up me-2"></i> Lưu Cập Nhật</button>
+                        <span id="saveStatus" class="me-3 text-success fw-bold" style="display:none; text-shadow: var(--glow-success);">
+                            <i class="fas fa-check-double"></i> Đã lưu vào Cloud!
+                        </span>
+                        <button type="submit" class="btn btn-outline-info px-4 py-2" style="border-color: var(--neon-spo2); color: var(--neon-spo2); border-radius: 10px;">
+                            <i class="fas fa-cloud-arrow-up me-2"></i> LƯU HỒ SƠ
+                        </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
-
     <div id="analytics" class="tab-pane">
         <div class="row">
             <div class="col-lg-8 mx-auto">
@@ -643,6 +649,7 @@
             document.getElementById('deviceIdInput').value = ""; // Xóa input
             initCharts();
             startListening();
+            loadPatientProfile();
         }, 600);
     }
 
@@ -823,6 +830,49 @@
             }
 
         }, 1800); 
+    }
+        // ====================== SỬA PHẦN HỒ SƠ - LƯU THẬT VÀO FIREBASE ======================
+    function savePatientProfile(e) {
+        e.preventDefault();
+
+        if (!currentId) {
+            alert("Vui lòng đăng nhập thiết bị trước!");
+            return;
+        }
+
+        const profileData = {
+            name: document.getElementById('pName').value.trim(),
+            age: parseInt(document.getElementById('pAge').value) || 0,
+            blood: document.getElementById('pBlood').value,
+            history: document.getElementById('pHistory').value.trim()
+        };
+
+        // Lưu vào Firebase
+        db.ref("/devices/" + currentId + "/profile").set(profileData)
+            .then(() => {
+                const status = document.getElementById('saveStatus');
+                status.style.display = 'inline-block';
+                setTimeout(() => { status.style.display = 'none'; }, 3000);
+            })
+            .catch((error) => {
+                alert("Lưu thất bại: " + error.message);
+            });
+    }
+
+    // Load hồ sơ khi đăng nhập
+    function loadPatientProfile() {
+        if (!currentId) return;
+
+        db.ref("/devices/" + currentId + "/profile").once('value')
+            .then((snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    document.getElementById('pName').value = data.name || "Nguyễn Văn A";
+                    document.getElementById('pAge').value = data.age || 45;
+                    document.getElementById('pBlood').value = data.blood || "O+";
+                    document.getElementById('pHistory').value = data.history || "Đang theo dõi rối loạn nhịp tim. Bệnh nhân có tiền sử tăng huyết áp vô căn.";
+                }
+            });
     }
 </script>
 </body>
