@@ -56,7 +56,7 @@
         .sidebar { background: rgba(16, 16, 22, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; transition: width 0.4s var(--smooth-ease); z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.5); overflow: hidden; }
         .sidebar.collapsed { width: 85px; } 
         
-        /* FIX LỖI MẤT NÚT 3 GẠCH CHÍNH XÁC Ở ĐÂY */
+        /* FIX LỖI MẤT NÚT 3 GẠCH */
         .sidebar-header { 
             height: 80px; 
             width: 100%;
@@ -75,12 +75,12 @@
         }
         .sidebar.collapsed .sidebar-header {
             padding: 0;
-            justify-content: center; /* Đẩy nút vào giữa khi Sidebar nhỏ */
+            justify-content: center;
         }
         .sidebar.collapsed .logo-text, .sidebar.collapsed .nav-text { 
             opacity: 0; 
             width: 0; 
-            display: none !important; /* Xóa sổ text khỏi flow để không chiếm chỗ */
+            display: none !important; 
         }
         
         .toggle-btn { 
@@ -426,28 +426,28 @@
                 </div>
 
                 <div class="row g-4">
-    <div class="col-md-6">
-        <div class="news-card sub-news" onclick="window.open('https://vientimmach.vn/', '_blank')">
-            <div class="news-img-wrapper">
-                <img src="https://thanhnien.mediacdn.vn/Uploaded/congthang/2022_08_04/bs-kham-benh-cho-nguoi-benh-4321.jpg" class="news-img" alt="Vien Tim Mach">
-            </div>
-            <div class="news-content">
-                <h5 class="news-title">Viện Tim Mạch Quốc Gia Việt Nam - Chuyên khoa tuyến cuối</h5>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-6">
-        <div class="news-card sub-news" onclick="window.open('https://nhathuoclongchau.com.vn/', '_blank')">
-            <div class="news-img-wrapper">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGSmSfqjzadgnoJ7j6EVJPfbARyqBNAB41FfkJU_w9Ue6EGvpprZ7FWSXwI9XpBd8yopeOhpbC6lAKWRJWjaCRy_uxoA-DkMW5TW32p8m-n-62KAfF-KlLtT9gg4oCw&s=10&ec=121630540" class="news-img" alt="Nha thuoc Long Chau">
-            </div>
-            <div class="news-content">
-                <h5 class="news-title">Hệ thống Nhà thuốc FPT Long Châu - Mua thuốc trực tuyến</h5>
-            </div>
-        </div>
-    </div>
-</div>
+                    <div class="col-md-6">
+                        <div class="news-card sub-news" onclick="window.open('https://vientimmach.vn/', '_blank')">
+                            <div class="news-img-wrapper">
+                                <img src="https://thanhnien.mediacdn.vn/Uploaded/congthang/2022_08_04/bs-kham-benh-cho-nguoi-benh-4321.jpg" class="news-img" alt="Vien Tim Mach">
+                            </div>
+                            <div class="news-content">
+                                <h5 class="news-title">Viện Tim Mạch Quốc Gia Việt Nam - Chuyên khoa tuyến cuối</h5>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="news-card sub-news" onclick="window.open('https://nhathuoclongchau.com.vn/', '_blank')">
+                            <div class="news-img-wrapper">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkGSmSfqjzadgnoJ7j6EVJPfbARyqBNAB41FfkJU_w9Ue6EGvpprZ7FWSXwI9XpBd8yopeOhpbC6lAKWRJWjaCRy_uxoA-DkMW5TW32p8m-n-62KAfF-KlLtT9gg4oCw&s=10&ec=121630540" class="news-img" alt="Nha thuoc Long Chau">
+                            </div>
+                            <div class="news-content">
+                                <h5 class="news-title">Hệ thống Nhà thuốc FPT Long Châu - Mua thuốc trực tuyến</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="col-lg-4">
