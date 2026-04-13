@@ -41,11 +41,48 @@
             scroll-behavior: smooth;
         }
 
+        /* --- MÀN HÌNH KHỞI ĐỘNG (SPLASH SCREEN) CỰC ĐẸP --- */
+        #splash-screen {
+            position: fixed; inset: 0; background: #050508; z-index: 100000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s var(--smooth-ease), visibility 0.8s;
+        }
+        .ecg-loader {
+            width: 250px; height: 100px;
+            position: relative;
+        }
+        .ecg-line {
+            fill: none;
+            stroke: var(--neon-spo2);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px var(--neon-spo2));
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawEcg 2.5s linear forwards;
+        }
+        @keyframes drawEcg { 0% { stroke-dashoffset: 1000; } 100% { stroke-dashoffset: 0; } }
+        .splash-text {
+            margin-top: 30px; font-size: 1.5rem; font-weight: bold; letter-spacing: 4px;
+            color: white; text-transform: uppercase;
+            animation: pulseText 1.5s infinite alternate;
+        }
+        @keyframes pulseText { 0% { opacity: 0.5; text-shadow: none; } 100% { opacity: 1; text-shadow: var(--glow-spo2); } }
+        .progress-bar-container {
+            width: 300px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 20px; overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; width: 0%; background: var(--neon-spo2); box-shadow: var(--glow-spo2);
+            animation: fillProgress 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes fillProgress { 0% { width: 0%; } 100% { width: 100%; } }
+
         /* KHUNG ĐĂNG NHẬP */
         #login-overlay { position: fixed; inset: 0; background: rgba(8, 8, 12, 0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center; transition: opacity 0.6s var(--smooth-ease), visibility 0.6s; }
         .login-card { background: var(--bg-card); padding: 40px; border-radius: 20px; border: 1px solid rgba(0, 229, 255, 0.2); box-shadow: var(--glow-spo2); width: 400px; text-align: center; transform: translateY(0); transition: 0.4s var(--smooth-ease); }
         .login-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 229, 255, 0.3); }
-        .login-card input { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.1rem; padding: 14px; border-radius: 12px; transition: 0.3s; }
+        .login-card input { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 1.1rem; padding: 14px; border-radius: 12px; transition: 0.3s; margin-bottom: 20px;}
         .login-card input:focus { background: rgba(0, 229, 255, 0.05); border-color: var(--neon-spo2); color: white; box-shadow: inset 0 0 10px rgba(0, 229, 255, 0.1), 0 0 15px rgba(0, 229, 255, 0.3); outline: none;}
         .btn-medical { background: linear-gradient(135deg, #0088cc, var(--neon-spo2)); color: #000; font-weight: 800; border: none; border-radius: 12px; transition: all 0.4s var(--smooth-ease); box-shadow: var(--glow-spo2); overflow: hidden; position: relative;}
         .btn-medical::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transition: 0.5s; }
@@ -56,47 +93,14 @@
         .sidebar { background: rgba(16, 16, 22, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); height: 100vh; position: fixed; width: 280px; padding: 0; display: flex; flex-direction: column; transition: width 0.4s var(--smooth-ease); z-index: 1000; box-shadow: 5px 0 25px rgba(0,0,0,0.5); overflow: hidden; }
         .sidebar.collapsed { width: 85px; } 
         
-        /* FIX LỖI MẤT NÚT 3 GẠCH */
         .sidebar-header { 
-            height: 80px; 
-            width: 100%;
-            padding: 0 20px; 
-            border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            transition: padding 0.4s var(--smooth-ease);
-            box-sizing: border-box;
+            height: 80px; width: 100%; padding: 0 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; transition: padding 0.4s var(--smooth-ease); box-sizing: border-box;
         }
-        .logo-text {
-            white-space: nowrap;
-            overflow: hidden;
-            transition: opacity 0.3s;
-        }
-        .sidebar.collapsed .sidebar-header {
-            padding: 0;
-            justify-content: center;
-        }
-        .sidebar.collapsed .logo-text, .sidebar.collapsed .nav-text { 
-            opacity: 0; 
-            width: 0; 
-            display: none !important; 
-        }
+        .logo-text { white-space: nowrap; overflow: hidden; transition: opacity 0.3s; }
+        .sidebar.collapsed .sidebar-header { padding: 0; justify-content: center; }
+        .sidebar.collapsed .logo-text, .sidebar.collapsed .nav-text { opacity: 0; width: 0; display: none !important; }
         
-        .toggle-btn { 
-            background: none; 
-            border: none; 
-            color: var(--text-secondary); 
-            cursor: pointer; 
-            font-size: 1.5rem; 
-            width: 45px;
-            height: 45px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            transition: 0.3s; 
-        }
+        .toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; transition: 0.3s; }
         .toggle-btn:hover { color: var(--neon-spo2); background: rgba(0,229,255,0.1); text-shadow: var(--glow-spo2); }
         
         /* HIỆU ỨNG NAV LINK */
@@ -165,78 +169,45 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--neon-spo2); }
 
-        /* --- GIAO DIỆN TIN TỨC --- */
-        .news-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 15px;
-            overflow: hidden;
-            transition: all 0.4s var(--smooth-ease);
-            cursor: pointer;
-            height: 100%;
-        }
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(0, 229, 255, 0.4);
-            box-shadow: 0 10px 25px rgba(0, 229, 255, 0.15);
-        }
+        /* TIN TỨC */
+        .news-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; overflow: hidden; transition: all 0.4s var(--smooth-ease); cursor: pointer; height: 100%; }
+        .news-card:hover { transform: translateY(-5px); border-color: rgba(0, 229, 255, 0.4); box-shadow: 0 10px 25px rgba(0, 229, 255, 0.15); }
         .news-img-wrapper { overflow: hidden; position: relative; }
-        .news-img {
-            width: 100%;
-            object-fit: cover;
-            transition: transform 0.6s var(--smooth-ease);
-        }
+        .news-img { width: 100%; object-fit: cover; transition: transform 0.6s var(--smooth-ease); }
         .news-card:hover .news-img { transform: scale(1.08); }
         .featured-news .news-img { height: 350px; }
         .sub-news .news-img { height: 160px; }
         .news-content { padding: 20px; }
-        .news-title {
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-            transition: 0.3s;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
+        .news-title { font-weight: 700; color: var(--text-primary); margin-bottom: 10px; transition: 0.3s; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .news-card:hover .news-title { color: var(--neon-spo2); }
-        .news-desc {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .news-banner {
-            background: linear-gradient(145deg, #0a192f, #020c1b);
-            border: 1px solid var(--neon-spo2);
-            border-radius: 15px;
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: inset 0 0 20px rgba(0,229,255,0.1);
-        }
-        .news-list-item {
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            gap: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+        .news-desc { color: var(--text-secondary); font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .news-banner { background: linear-gradient(145deg, #0a192f, #020c1b); border: 1px solid var(--neon-spo2); border-radius: 15px; padding: 30px 20px; text-align: center; box-shadow: inset 0 0 20px rgba(0,229,255,0.1); }
+        .news-list-item { padding: 15px 0; border-bottom: 1px solid var(--border-color); display: flex; gap: 15px; cursor: pointer; transition: 0.3s; }
         .news-list-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; }
         .news-list-item:last-child { border-bottom: none; }
     </style>
 </head>
 <body>
 
+<div id="splash-screen">
+    <div class="ecg-loader">
+        <svg viewBox="0 0 250 100" xmlns="http://www.w3.org/2000/svg">
+            <polyline class="ecg-line" points="0,50 50,50 65,20 80,80 95,50 150,50 165,10 185,90 200,50 250,50" />
+        </svg>
+    </div>
+    <div class="splash-text">MED-CORE PRO</div>
+    <div class="text-secondary mt-2" style="font-family: monospace;">Khởi tạo hệ thống y tế cốt lõi...</div>
+    <div class="progress-bar-container">
+        <div class="progress-bar-fill"></div>
+    </div>
+</div>
+
 <div id="login-overlay">
     <div class="login-card">
         <i class="fas fa-fingerprint fa-4x mb-4" style="color: var(--neon-spo2); filter: drop-shadow(0 0 15px rgba(0,229,255,0.6));"></i>
         <h3 class="fw-bold mb-2 text-white" style="letter-spacing: 2px;">MED<span style="color: var(--neon-spo2)">-CORE</span> <span style="font-size: 1rem; color: var(--neon-purple); vertical-align: top;">PRO</span></h3>
         <p class="text-secondary mb-4">Xác thực hệ thống & Đồng bộ dữ liệu</p>
-        <input type="text" id="deviceIdInput" class="form-control mb-4" placeholder="Nhập ID Thiết Bị (VD: ESP8266_01)">
+        <input type="text" id="deviceIdInput" class="form-control" placeholder="Nhập ID Thiết Bị (VD: ESP8266_01)">
         <button onclick="accessSystem()" class="btn btn-medical w-100 py-3 fs-5">KHỞI ĐỘNG HỆ THỐNG</button>
     </div>
 </div>
@@ -255,6 +226,7 @@
         <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-chart-gantt nav-icon"></i> <span class="nav-text">Lịch Sử Đo Lường</span></div>
         <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-triangle-exclamation nav-icon"></i> <span class="nav-text">Nhật Ký Cảnh Báo</span></div>
         <div class="nav-link" onclick="switchMenu('news', this)"><i class="fas fa-newspaper nav-icon"></i> <span class="nav-text">Tin Tức Y Tế</span></div>
+        <div class="nav-link mt-4 border-top pt-4" style="border-color: var(--border-color)!important" onclick="switchMenu('settings', this)"><i class="fas fa-cog nav-icon" style="color: var(--text-secondary)"></i> <span class="nav-text">Cài đặt Hệ thống</span></div>
     </div>
 </div>
 
@@ -413,7 +385,6 @@
 
         <div class="row g-4">
             <div class="col-lg-8">
-                
                 <div class="news-card featured-news mb-4" onclick="window.open('https://vnexpress.net/suc-khoe/cac-benh/benh-tim-mach', '_blank')">
                     <div class="news-img-wrapper">
                         <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80&w=1000" class="news-img" alt="VnExpress Tim Mach">
@@ -436,7 +407,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="col-md-6">
                         <div class="news-card sub-news" onclick="window.open('https://nhathuoclongchau.com.vn/', '_blank')">
                             <div class="news-img-wrapper">
@@ -457,24 +427,43 @@
                     <p class="text-secondary small mb-4">Phát hiện sớm bất thường nhịp tim với độ chính xác cao nhờ hệ thống thuật toán MED-CORE PRO.</p>
                     <button class="btn btn-outline-info w-100 rounded-pill" onclick="switchMenu('analytics', document.querySelectorAll('.nav-link')[2])">Phân tích ngay</button>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="card-stat p-0 overflow-hidden">
-                    <div class="p-3 border-bottom" style="border-color: var(--border-color)!important">
-                        <h6 class="fw-bold m-0 text-white"><i class="fas fa-link me-2 text-warning"></i> LIÊN KẾT NHANH</h6>
+    <div id="settings" class="tab-pane">
+        <div class="card-stat">
+            <h4 class="fw-bold mb-4"><i class="fas fa-cog me-2" style="color: var(--text-secondary);"></i> Cài Đặt Hệ Thống</h4>
+            
+            <div class="row g-4">
+                <div class="col-xl-6">
+                    <div class="p-4 rounded-4" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                        <h5 class="text-white fw-bold mb-3"><i class="fas fa-user-shield me-2 text-warning"></i> Quản Lý Phiên Đăng Nhập</h5>
+                        <hr style="border-color: rgba(255,255,255,0.1);">
+                        
+                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                            <span class="text-secondary">Trạng thái kết nối:</span>
+                            <span class="badge bg-success text-white" id="settingConnStatus"><i class="fas fa-wifi me-1"></i> Online</span>
+                        </div>
+                        <div class="mb-4 d-flex justify-content-between align-items-center">
+                            <span class="text-secondary">ID Thiết bị đang dùng:</span>
+                            <strong class="text-white fs-5" id="settingDeviceIdDisplay">Chưa có</strong>
+                        </div>
+                        
+                        <button onclick="logoutSystem()" class="btn w-100 py-3 fw-bold mt-2" style="background: rgba(255, 42, 95, 0.1); border: 1px solid rgba(255, 42, 95, 0.4); color: var(--neon-hr); border-radius: 12px; transition: 0.3s;">
+                            <i class="fas fa-power-off me-2"></i> NGẮT KẾT NỐI & ĐĂNG XUẤT
+                        </button>
                     </div>
-                    <div class="p-3">
-                        <div class="news-list-item" onclick="window.open('https://vnexpress.net/suc-khoe/cac-benh/benh-tim-mach', '_blank')">
-                            <span class="text-secondary fw-bold fs-5">01</span>
-                            <div><h6 class="news-title fs-6 mb-1">Cẩm nang phòng ngừa bệnh nhồi máu cơ tim (VnExpress)</h6></div>
-                        </div>
-                        <div class="news-list-item" onclick="window.open('https://vientimmach.vn/', '_blank')">
-                            <span class="text-secondary fw-bold fs-5">02</span>
-                            <div><h6 class="news-title fs-6 mb-1">Đặt lịch khám bệnh tại Viện Tim Mạch Quốc Gia</h6></div>
-                        </div>
-                        <div class="news-list-item" onclick="window.open('https://nhathuoclongchau.com.vn/', '_blank')">
-                            <span class="text-secondary fw-bold fs-5">03</span>
-                            <div><h6 class="news-title fs-6 mb-1">Tra cứu các loại thuốc điều trị tim mạch (Long Châu)</h6></div>
-                        </div>
+                </div>
+
+                <div class="col-xl-6">
+                    <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
+                        <h5 class="text-white fw-bold mb-3"><i class="fas fa-circle-info me-2 text-info"></i> Thông Tin Phần Mềm</h5>
+                        <hr style="border-color: rgba(255,255,255,0.1);">
+                        <p class="text-secondary mb-2">Phiên bản: <strong class="text-white">v3.1.0 (Bản Pro Neon)</strong></p>
+                        <p class="text-secondary mb-2">Bản quyền: <strong class="text-white">Dự án Đồ án Y tế IoT</strong></p>
+                        <p class="text-secondary mb-2">Cơ sở dữ liệu: <strong class="text-info">Google Firebase Realtime Database</strong></p>
+                        <p class="text-secondary mb-0">Engine AI: <strong class="text-purple" style="color: var(--neon-purple);">MedCore Diagnostic Engine Beta</strong></p>
                     </div>
                 </div>
             </div>
@@ -484,6 +473,17 @@
 </div>
 
 <script>
+    // --- XỬ LÝ SPLASH SCREEN (MÀN HÌNH KHỞI ĐỘNG) ---
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.visibility = 'hidden';
+            }, 800); // Đợi CSS transition chạy xong
+        }, 3000); // Hiện splash screen trong 3 giây
+    });
+
     // --- UI LOGIC ---
     function switchMenu(tabId, element) {
         if(element.classList.contains('active')) return;
@@ -526,7 +526,7 @@
     style.innerHTML = `@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`;
     document.head.appendChild(style);
 
-    // --- FIREBASE & CHART LOGIC ---
+    // --- FIREBASE & LÕI HỆ THỐNG ---
     const firebaseConfig = {
         apiKey: "AIzaSyBiDaQIash5NR2nH8FhQa56jj3OqxPM210",
         authDomain: "doan2-cdeec.firebaseapp.com",
@@ -545,6 +545,9 @@
     Chart.defaults.font.family = 'Segoe UI';
 
     function initCharts() {
+        if (bpmChart) bpmChart.destroy();
+        if (spo2Chart) spo2Chart.destroy();
+
         const ctxBpm = document.getElementById('bpmChart').getContext('2d');
         const gradBpm = ctxBpm.createLinearGradient(0, 0, 0, 200);
         gradBpm.addColorStop(0, 'rgba(255, 42, 95, 0.4)');
@@ -582,6 +585,7 @@
         });
     }
 
+    // --- ĐĂNG NHẬP ---
     function accessSystem() {
         const input = document.getElementById('deviceIdInput').value.trim();
         if(!input) return alert("Vui lòng nhập ID thiết bị (Ví dụ: ESP8266_01)!");
@@ -591,11 +595,55 @@
         setTimeout(() => {
             document.getElementById('login-overlay').style.visibility = "hidden";
             document.getElementById('idDisplay').innerText = currentId;
+            document.getElementById('settingDeviceIdDisplay').innerText = currentId; // Cập nhật ID ở Cài đặt
+            document.getElementById('deviceIdInput').value = ""; // Xóa input
             initCharts();
             startListening();
         }, 600);
     }
 
+    // --- ĐĂNG XUẤT ---
+    function logoutSystem() {
+        // Ngắt kết nối Firebase
+        if (currentId) {
+            db.ref("/devices/" + currentId).off();
+        }
+        
+        // Xóa thông số
+        currentId = "";
+        currentBPM = 0;
+        currentSPO2 = 0;
+        
+        // Reset UI Header
+        document.getElementById('idDisplay').innerText = "Đang chờ...";
+        document.getElementById('settingDeviceIdDisplay').innerText = "Chưa có";
+        document.getElementById('bpmVal').innerHTML = `--<span class="value-unit">BPM</span>`;
+        document.getElementById('spo2Val').innerHTML = `--<span class="value-unit">%</span>`;
+        
+        document.getElementById('connectionStatus').className = "badge-status mb-2";
+        document.getElementById('connectionStatus').style.background = "rgba(255, 183, 3, 0.1)";
+        document.getElementById('connectionStatus').style.border = "1px solid rgba(255, 183, 3, 0.3)";
+        document.getElementById('connectionStatus').style.color = "var(--neon-warning)";
+        document.getElementById('statusDot').className = "fas fa-spinner fa-pulse me-2";
+        document.getElementById('statusText').innerText = "Đã ngắt kết nối";
+
+        // Reset biểu đồ & bảng
+        if(bpmChart) { bpmChart.data.datasets[0].data = []; bpmChart.update(); }
+        if(spo2Chart) { spo2Chart.data.datasets[0].data = []; spo2Chart.update(); }
+        document.getElementById('liveTable').innerHTML = "";
+        document.getElementById('fullHistoryTable').innerHTML = "";
+        document.getElementById('alertTable').innerHTML = "";
+
+        // Chuyển lại về Tab Monitor cho lần đăng nhập sau
+        switchMenu('monitor', document.querySelectorAll('.nav-link')[0]);
+
+        // Hiện lại màn hình Đăng nhập
+        const loginOverlay = document.getElementById('login-overlay');
+        loginOverlay.style.visibility = "visible";
+        loginOverlay.style.opacity = "1";
+    }
+
+    // --- LẮNG NGHE DỮ LIỆU ---
     function startListening() {
         db.ref("/devices/" + currentId).on('value', (s) => {
             const data = s.val();
@@ -614,6 +662,7 @@
             
             if(currentBPM > 0) {
                 badge.className = "badge-status bg-normal mb-2";
+                badge.style = ""; // clear inline style
                 dot.className = "fas fa-circle me-2 text-success";
                 txt.innerText = "Đang Đồng Bộ Dữ Liệu";
             } else {
@@ -657,6 +706,7 @@
         });
     }
 
+    // --- PHÂN TÍCH AI ---
     function runDiagnosis() {
         const icon = document.getElementById('diagIcon');
         const btn = icon.parentElement;
