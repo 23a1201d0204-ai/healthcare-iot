@@ -316,16 +316,52 @@
     </div>
 </div>
 
-<div id="login-overlay">
-    <div class="login-card">
-        <i class="fas fa-fingerprint fa-5x mb-4 fingerprint-icon" style="color: var(--neon-spo2);"></i>
-        <h3 class="fw-bold mb-2 text-white" style="letter-spacing: 3px;">ĐỒ ÁN<span style="color: var(--neon-spo2)"> 2</span> <span style="font-size: 1.1rem; color: var(--neon-purple);">PRO</span></h3>
-        <p class="text-secondary mb-4">Xác thực hệ thống & Đồng bộ dữ liệu</p>
-        <input type="text" id="deviceIdInput" class="form-control" placeholder="Nhập ID Thiết Bị (VD: ESP8266_01)">
-        <button onclick="accessSystem()" class="btn btn-medical w-100 py-3 fs-5">KHỞI ĐỘNG HỆ THỐNG</button>
+<!-- ==================== LOGIN HỆ THỐNG MỚI (BỆNH NHÂN / BÁC SĨ) ==================== -->
+<div id="login-overlay" style="position: fixed; inset: 0; background: rgba(8,8,12,0.95); backdrop-filter: blur(15px); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+    <div class="login-card" style="width: 460px;">
+        <i class="fas fa-hospital-user fa-4x mb-3" style="color: var(--neon-spo2);"></i>
+        <h3 class="fw-bold mb-2" style="letter-spacing: 3px;">HỆ THỐNG Y TẾ PRO</h3>
+        <p class="text-secondary mb-4">Đăng nhập hoặc tạo tài khoản</p>
+
+        <!-- Chọn loại tài khoản -->
+        <div class="mb-4">
+            <div class="btn-group w-100" role="group">
+                <input type="radio" class="btn-check" name="userRole" id="rolePatient" value="patient" checked>
+                <label class="btn btn-outline-info" for="rolePatient">BỆNH NHÂN</label>
+                <input type="radio" class="btn-check" name="userRole" id="roleDoctor" value="doctor">
+                <label class="btn btn-outline-info" for="roleDoctor">BÁC SĨ</label>
+            </div>
+        </div>
+
+        <input type="text" id="usernameInput" class="form-control mb-3" placeholder="Tên đăng nhập">
+        <input type="password" id="passwordInput" class="form-control mb-4" placeholder="Mật khẩu">
+
+        <button onclick="handleLogin()" class="btn btn-medical w-100 py-3 fs-5 mb-3">ĐĂNG NHẬP</button>
+        
+        <div class="text-center">
+            <button onclick="showRegisterModal()" class="btn btn-link text-info">Chưa có tài khoản? Đăng ký ngay</button>
+        </div>
     </div>
 </div>
 
+<!-- Modal Đăng ký (chỉ cho Bệnh nhân) -->
+<div id="register-modal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: var(--bg-card); color: white; border: 1px solid var(--neon-spo2);">
+            <div class="modal-header">
+                <h5 class="modal-title">Đăng ký tài khoản Bệnh nhân</h5>
+                <button type="button" class="btn-close btn-close-white" onclick="hideRegisterModal()"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="regUsername" class="form-control mb-3" placeholder="Tên đăng nhập">
+                <input type="password" id="regPassword" class="form-control mb-3" placeholder="Mật khẩu">
+                <input type="text" id="regFullName" class="form-control mb-4" placeholder="Họ và tên đầy đủ">
+                <button onclick="registerAccount()" class="btn btn-outline-info w-100">TẠO TÀI KHOẢN</button>
+            </div>
+        </div>
+    </div>
+</div>
+    
 <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <h4 class="fw-bold text-white m-0 d-flex align-items-center logo-text" style="letter-spacing: 1px;">
@@ -341,6 +377,7 @@
         <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-triangle-exclamation nav-icon"></i> <span class="nav-text">Nhật Ký Cảnh Báo</span></div>
         <div class="nav-link" onclick="switchMenu('news', this)"><i class="fas fa-newspaper nav-icon"></i> <span class="nav-text">Tin Tức Y Tế</span></div>
         <div class="nav-link" onclick="switchMenu('appointments', this)"><i class="fas fa-calendar-plus nav-icon"></i> <span class="nav-text">Đặt Lịch Khám</span></div>
+        <div class="nav-link" onclick="switchMenu('doctorPanel', this)" style="display: none;" id="doctorNavLink"><i class="fas fa-user-doctor nav-icon"></i> <span class="nav-text">Bác sĩ - Quản lý</span></div>
         <div class="nav-link mt-4 border-top pt-4" style="border-color: var(--border-color)!important" onclick="switchMenu('settings', this)"><i class="fas fa-cog nav-icon" style="color: var(--text-secondary)"></i> <span class="nav-text">Cài đặt Hệ thống</span></div>
     </div>
 </div>
@@ -725,6 +762,94 @@
         </div>
     </div>
     <!-- ==================== KẾT THÚC TAB ĐẶT LỊCH KHÁM ==================== -->
+        <!-- ==================== TAB BÁC SĨ - QUẢN LÝ TOÀN BỆNH NHÂN ==================== -->
+    <div id="doctorPanel" class="tab-pane">
+        <div class="card-stat">
+            <h4 class="fw-bold mb-4">
+                <i class="fas fa-user-doctor me-2" style="color: var(--neon-purple);"></i>
+                Bác sĩ - Quản lý & Theo dõi Bệnh nhân
+            </h4>
+            
+            <!-- Phần tìm kiếm Device ID -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <label class="form-label">Nhập mã thiết bị ESP8266 của bệnh nhân</label>
+                    <input type="text" id="doctorSearchDevice" 
+                           class="form-control form-control-neon" 
+                           placeholder="Ví dụ: ESP8266_01, ESP32_05...">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button onclick="doctorLoadPatient()" 
+                            class="btn btn-outline-info w-100 py-2">
+                        <i class="fas fa-search me-2"></i>
+                        TẢI DỮ LIỆU BỆNH NHÂN
+                    </button>
+                </div>
+            </div>
+
+            <!-- Nội dung hiển thị sau khi tải -->
+            <div id="doctorContent" style="display: none;">
+                
+                <div class="patient-header mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-user-circle fa-3x me-3" style="color: var(--neon-spo2);"></i>
+                        <div>
+                            <h5 class="mb-1">Bệnh nhân: <span id="doctorPatientName" class="text-info fw-bold"></span></h5>
+                            <p class="mb-0 text-secondary">Thiết bị: <span id="doctorDeviceIdShow" class="fw-bold text-white"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hồ sơ bệnh nhân -->
+                <div class="card-stat mb-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: var(--border-color);">
+                        <i class="fas fa-address-card me-2"></i> Hồ sơ bệnh nhân
+                    </h6>
+                    <div id="doctorProfileDisplay" class="row g-3"></div>
+                </div>
+
+                <!-- Lịch khám -->
+                <div class="card-stat mb-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: var(--border-color);">
+                        <i class="fas fa-calendar-check me-2"></i> Lịch khám đã đặt
+                    </h6>
+                    <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Ngày Giờ</th>
+                                    <th>Lý do khám</th>
+                                    <th>Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctorAppointmentList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Lịch sử đo lường -->
+                <div class="card-stat">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2" style="border-color: var(--border-color);">
+                        <i class="fas fa-history me-2"></i> Lịch sử đo lường gần đây
+                    </h6>
+                    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                        <table class="table-custom">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Nhịp tim (BPM)</th>
+                                    <th>SpO₂ (%)</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="doctorHistoryList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== KẾT THÚC TAB BÁC SĨ ==================== -->
 </div>
 
 <script>
@@ -844,28 +969,88 @@ if (tabId === 'appointments') loadAppointments();
         });
     }
 
-    // --- ĐĂNG NHẬP ---
-    function accessSystem() {
-        const input = document.getElementById('deviceIdInput').value.trim();
-        if(!input) return alert("Vui lòng nhập ID thiết bị (Ví dụ: ESP8266_01)!");
-        currentId = input;
+   // ==================== HỆ THỐNG TÀI KHOẢN MỚI ====================
+let currentUser = null;        // {username, role, linkedDeviceId}
+let currentDeviceId = null;
+
+function handleLogin() {
+    const username = document.getElementById('usernameInput').value.trim();
+    const password = document.getElementById('passwordInput').value;
+    const role = document.querySelector('input[name="userRole"]:checked').value;
+
+    if (!username || !password) return alert("Vui lòng nhập đầy đủ!");
+
+    db.ref("/users/" + username).once('value').then(snapshot => {
+        const userData = snapshot.val();
+        if (!userData || userData.password !== password) {
+            return alert("❌ Sai tên đăng nhập hoặc mật khẩu!");
+        }
+        if (userData.role !== role) {
+            return alert("❌ Tài khoản này không phải là " + (role === "patient" ? "Bệnh nhân" : "Bác sĩ"));
+        }
+
+        currentUser = { username, role, linkedDeviceId: userData.linkedDeviceId || null };
         
+        // Ẩn login
         document.getElementById('login-overlay').style.opacity = "0";
         setTimeout(() => {
             document.getElementById('login-overlay').style.visibility = "hidden";
-            document.getElementById('idDisplay').innerText = currentId;
-            document.getElementById('settingDeviceIdDisplay').innerText = currentId; // Cập nhật ID ở Cài đặt
-            document.getElementById('deviceIdInput').value = ""; // Xóa input
+
+            // Thiết lập Device ID
+            if (role === "patient") {
+                currentDeviceId = currentUser.linkedDeviceId;
+                if (!currentDeviceId) alert("⚠️ Bạn chưa liên kết thiết bị ESP8266. Vui lòng liên kết trong Cài đặt!");
+            } else {
+                currentDeviceId = null; // Bác sĩ sẽ nhập sau
+                document.getElementById('doctorNavLink').style.display = 'block';
+            }
+
+            document.getElementById('idDisplay').innerText = currentDeviceId || "Bác sĩ";
             initCharts();
-            startListening();
-            loadPatientProfile();
+            if (currentDeviceId) startListening();
         }, 600);
-    }
+    });
+}
+
+function registerAccount() {
+    const username = document.getElementById('regUsername').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const fullName = document.getElementById('regFullName').value.trim();
+
+    if (!username || !password) return alert("Vui lòng nhập đầy đủ!");
+
+    db.ref("/users/" + username).once('value').then(snapshot => {
+        if (snapshot.exists()) return alert("Tên đăng nhập đã tồn tại!");
+
+        db.ref("/users/" + username).set({
+            password: password,
+            role: "patient",
+            fullName: fullName,
+            linkedDeviceId: null
+        }).then(() => {
+            alert("✅ Đăng ký thành công! Bạn có thể đăng nhập ngay.");
+            hideRegisterModal();
+        });
+    });
+}
+
+function showRegisterModal() {
+    const modal = new bootstrap.Modal(document.getElementById('register-modal'));
+    modal.show();
+}
+
+function hideRegisterModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('register-modal'));
+    if (modal) modal.hide();
+}
 
     // --- ĐĂNG XUẤT ---
     function logoutSystem() {
         // Ngắt kết nối Firebase
         if (currentId) {
+                currentUser = null;
+    currentDeviceId = null;
+    document.getElementById('doctorNavLink').style.display = 'none';
             db.ref("/devices/" + currentId).off();
         }
         
@@ -905,7 +1090,7 @@ if (tabId === 'appointments') loadAppointments();
 
     // --- LẮNG NGHE DỮ LIỆU ---
     function startListening() {
-        db.ref("/devices/" + currentId).on('value', (s) => {
+        db.ref("/devices/" + currentDeviceId).on('value', (s) => {
             const data = s.val();
             if(!data) return;
             
