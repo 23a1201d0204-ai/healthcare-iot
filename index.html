@@ -299,6 +299,102 @@
     background-color: var(--neon-spo2);
     color: #000;
 }
+        \\nút tư vấn
+<button onclick="toggleChat()" class="consult-btn">
+    <i class="fas fa-comments"></i> Tư vấn ngay
+</button>
+
+<!-- Khung Chat Tư Vấn -->
+<div id="chatBox" class="chat-box" style="display: none;">
+    <div class="chat-header">
+        <strong>🤖 Tư Vấn Viên AI - ĐỒ ÁN 2</strong>
+        <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:1.5rem;">×</button>
+    </div>
+    <div id="chatMessages" class="chat-messages"></div>
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Nhập câu hỏi của bạn..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Gửi</button>
+    </div>
+</div>
+        /* Nút tư vấn nổi */
+.consult-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, var(--neon-spo2), #0088cc);
+    color: #000;
+    border: none;
+    padding: 15px 20px;
+    border-radius: 50px;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(0, 229, 255, 0.4);
+    z-index: 9999;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.consult-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 15px 40px rgba(0, 229, 255, 0.6);
+}
+
+/* Khung chat */
+.chat-box {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 380px;
+    height: 520px;
+    background: var(--bg-card);
+    border: 2px solid var(--neon-spo2);
+    border-radius: 16px;
+    box-shadow: 0 0 40px rgba(0, 229, 255, 0.5);
+    z-index: 10000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-header {
+    background: linear-gradient(90deg, #0a192f, #1e3a8a);
+    padding: 15px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #0f0f17;
+}
+
+.chat-input-area {
+    padding: 12px;
+    background: #14141d;
+    display: flex;
+    gap: 8px;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    background: #1a1a24;
+    color: white;
+}
+
+.chat-input-area button {
+    background: var(--neon-spo2);
+    color: black;
+    border: none;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-weight: bold;
+}
     </style>
 </head>
 <body>
@@ -1009,6 +1105,76 @@
                 }
             });
     }
+    // Mở / Đóng chat
+function toggleChat() {
+    const chat = document.getElementById('chatBox');
+    chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
+}
+
+// Gửi tin nhắn
+function sendMessage() {
+    const input = document.getElementById('userInput');
+    const message = input.value.trim();
+    if (!message) return;
+
+    // Hiển thị tin nhắn người dùng
+    addMessage(message, 'user');
+    input.value = '';
+
+    // Giả lập AI đang suy nghĩ
+    setTimeout(() => {
+        const reply = getRandomMedicalReply(message);
+        addMessage(reply, 'ai');
+    }, 800);
+}
+
+// Thêm tin nhắn vào khung chat
+function addMessage(text, sender) {
+    const messages = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.style.marginBottom = '12px';
+    div.style.padding = '10px 14px';
+    div.style.borderRadius = '12px';
+    div.style.maxWidth = '85%';
+
+    if (sender === 'user') {
+        div.style.background = '#00e5ff';
+        div.style.color = '#000';
+        div.style.alignSelf = 'flex-end';
+        div.style.marginLeft = 'auto';
+    } else {
+        div.style.background = '#1e2937';
+        div.style.color = '#e0f2fe';
+    }
+
+    div.innerHTML = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+// Danh sách câu trả lời AI ngẫu nhiên nhưng AN TOÀN & CHUẨN
+function getRandomMedicalReply(userMessage) {
+    const replies = [
+        "Cảm ơn bạn đã chia sẻ. Đây chỉ là thông tin tham khảo. **Bạn nên đến gặp bác sĩ** để được tư vấn chính xác nhất nhé.",
+        "Triệu chứng bạn mô tả có thể do nhiều nguyên nhân. Khuyến nghị mạnh mẽ là **khám trực tiếp tại cơ sở y tế** gần nhất.",
+        "Tôi không phải là bác sĩ, chỉ là trợ lý AI hỗ trợ thông tin. Bạn nên liên hệ hotline hoặc đến bệnh viện để kiểm tra.",
+        "Rất quan trọng là không tự ý dùng thuốc. Hãy đến bác sĩ để được chẩn đoán và kê đơn phù hợp.",
+        "Cảm ơn câu hỏi của bạn. Trong lúc chờ khám, bạn có thể nghỉ ngơi, uống đủ nước và theo dõi thêm triệu chứng.",
+        "Tôi khuyên bạn nên gọi ngay hotline tư vấn sức khỏe hoặc đến phòng cấp cứu nếu triệu chứng nặng.",
+        "Thông tin bạn cung cấp rất hữu ích. Tuy nhiên, AI không thay thế được bác sĩ thực tế. Hãy ưu tiên khám lâm sàng."
+    ];
+
+    // Có thể thêm logic đơn giản dựa trên từ khóa
+    const lowerMsg = userMessage.toLowerCase();
+    if (lowerMsg.includes("tim") || lowerMsg.includes("nhịp")) {
+        return "Nhịp tim bất thường cần được kiểm tra sớm. **Hãy đến bệnh viện tim mạch** để đo ECG nhé.";
+    }
+    if (lowerMsg.includes("oxy") || lowerMsg.includes("spO2") || lowerMsg.includes("thở")) {
+        return "Nếu SpO2 thấp, đây là dấu hiệu cần chú ý. **Nên đến cơ sở y tế ngay** để được hỗ trợ hô hấp.";
+    }
+
+    return replies[Math.floor(Math.random() * replies.length)];
+}
 </script>
 </body>
 </html>
