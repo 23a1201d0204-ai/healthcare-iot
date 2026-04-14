@@ -340,6 +340,7 @@
         <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-chart-gantt nav-icon"></i> <span class="nav-text">Lịch Sử Đo Lường</span></div>
         <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-triangle-exclamation nav-icon"></i> <span class="nav-text">Nhật Ký Cảnh Báo</span></div>
         <div class="nav-link" onclick="switchMenu('news', this)"><i class="fas fa-newspaper nav-icon"></i> <span class="nav-text">Tin Tức Y Tế</span></div>
+<div class="nav-link" onclick="switchMenu('chat', this)"><i class="fas fa-robot nav-icon" style="color: var(--neon-purple);"></i> <span class="nav-text">AI Trò Chuyện Thông Minh</span></div>
         <div class="nav-link mt-4 border-top pt-4" style="border-color: var(--border-color)!important" onclick="switchMenu('settings', this)"><i class="fas fa-cog nav-icon" style="color: var(--text-secondary)"></i> <span class="nav-text">Cài đặt Hệ thống</span></div>
     </div>
 </div>
@@ -527,7 +528,7 @@
         <div class="card-stat">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h4 class="fw-bold m-0"><i class="fas fa-server me-2" style="color: var(--neon-spo2);"></i> Data Warehouse</h4>
-                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="document.getElementById('fullHistoryTable').innerHTML = ''"><i class="fas fa-trash-can me-1"></i> Clear Data</button>
+               <button class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="clearHistory()"><i class="fas fa-trash-can me-1"></i> Clear Data</button>
             </div>
             <div class="table-responsive" style="max-height: 500px; overflow-y: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
                 <table class="table-custom">
@@ -630,7 +631,29 @@
                         </button>
                     </div>
                 </div>
-
+<!-- === TAB AI TRÒ CHUYỆN MỚI === -->
+<div id="chat" class="tab-pane">
+    <div class="card-stat">
+        <h4 class="fw-bold mb-3">
+            <i class="fas fa-robot me-2" style="color: var(--neon-purple);"></i> 
+            AI Trợ Lý Y Tế Thông Minh
+        </h4>
+        <p class="text-secondary mb-4">Tôi biết chỉ số realtime của bạn và sẽ đưa lời khuyên cá nhân hóa.</p>
+        
+        <div id="chatContainer" style="height: 520px; border: 1px solid var(--border-color); border-radius: 16px; background: rgba(20,20,29,0.7); display: flex; flex-direction: column;">
+            <div id="chatMessages" style="flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;"></div>
+            
+            <div style="padding: 15px; border-top: 1px solid var(--border-color); display: flex; gap: 10px;">
+                <input id="chatInput" type="text" class="form-control form-control-neon flex-grow-1" 
+                       placeholder="Hỏi tôi về nhịp tim, SpO2, ăn uống, tập luyện..." 
+                       onkeydown="if(event.keyCode===13) sendChatMessage();">
+                <button onclick="sendChatMessage()" class="btn btn-medical px-4">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="col-xl-6">
                     <div class="p-4 rounded-4 h-100" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);">
                         <h5 class="text-white fw-bold mb-3"><i class="fas fa-circle-info me-2 text-info"></i> Thông Tin Phần Mềm</h5>
@@ -869,7 +892,16 @@
                 const liveTable = document.getElementById('liveTable');
                 liveTable.insertAdjacentHTML('afterbegin', liveRow);
                 if(liveTable.rows.length > 6) liveTable.deleteRow(6);
-
+// === PHẦN THÊM VÀO CUỐI HÀM startListening() ===
+if (currentBPM > 0) {
+    const isDanger = (currentBPM > 100 || (currentBPM < 50 && currentBPM > 0) || currentSPO2 < 94);
+    db.ref(`/devices/${currentId}/measurements`).push({
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        bpm: currentBPM,
+        spo2: currentSPO2,
+        status: isDanger ? "Bất thường" : "Ổn định"
+    });
+}
                 const histRow = `<tr><td>${fullTimeStr}</td><td class="text-info">${currentId}</td><td>${currentBPM}</td><td>${currentSPO2}%</td><td>${statusHtml}</td></tr>`;
                 document.getElementById('fullHistoryTable').insertAdjacentHTML('afterbegin', histRow);
 
@@ -967,21 +999,29 @@
         }, 4500); // Loading kéo dài 4.5 giây - rất giống phim khoa học viễn tưởng
     }
         // ====================== SỬA PHẦN HỒ SƠ - LƯU THẬT VÀO FIREBASE ======================
-    function savePatientProfile(e) {
-        e.preventDefault();
+   function savePatientProfile(e) {
+    e.preventDefault();
+    if (!currentId) return alert("Vui lòng kết nối thiết bị trước!");
 
-        if (!currentId) {
-            alert("Vui lòng đăng nhập thiết bị trước!");
-            return;
-        }
+    const profileData = {
+        name: document.getElementById('pName').value.trim(),
+        age: parseInt(document.getElementById('pAge').value) || 0,
+        gender: document.getElementById('pGender').value,
+        blood: document.getElementById('pBlood').value,
+        phone: document.getElementById('pPhone').value.trim(),
+        address: document.getElementById('pAddress').value.trim(),
+        startDate: document.getElementById('pStartDate').value,   // YYYY-MM-DD - không bị nhảy số nữa
+        history: document.getElementById('pHistory').value.trim()
+    };
 
-        const profileData = {
-            name: document.getElementById('pName').value.trim(),
-            age: parseInt(document.getElementById('pAge').value) || 0,
-            blood: document.getElementById('pBlood').value,
-            history: document.getElementById('pHistory').value.trim()
-        };
-
+    db.ref("/devices/" + currentId + "/profile").set(profileData)
+        .then(() => {
+            const status = document.getElementById('saveStatus');
+            status.style.display = 'inline-block';
+            setTimeout(() => status.style.display = 'none', 3000);
+        })
+        .catch(err => alert("Lưu lỗi: " + err.message));
+}
         // Lưu vào Firebase
         db.ref("/devices/" + currentId + "/profile").set(profileData)
             .then(() => {
@@ -995,20 +1035,119 @@
     }
 
     // Load hồ sơ khi đăng nhập
-    function loadPatientProfile() {
-        if (!currentId) return;
+   function loadPatientProfile() {
+    if (!currentId) return;
+    db.ref("/devices/" + currentId + "/profile").once('value')
+        .then(snapshot => {
+            const data = snapshot.val() || {};
+            document.getElementById('pName').value = data.name || "";
+            document.getElementById('pAge').value = data.age || "";
+            document.getElementById('pGender').value = data.gender || "";
+            document.getElementById('pBlood').value = data.blood || "";
+            document.getElementById('pPhone').value = data.phone || "";
+            document.getElementById('pAddress').value = data.address || "";
+            document.getElementById('pStartDate').value = data.startDate || "";
+            document.getElementById('pHistory').value = data.history || "";
+        });
+}
+    // Load lịch sử từ Firebase (không mất khi refresh)
+function loadHistory() {
+    const tableBody = document.getElementById('fullHistoryTable');
+    tableBody.innerHTML = '';
+    
+    db.ref(`/devices/${currentId}/measurements`).limitToLast(100).once('value', snapshot => {
+        let rows = [];
+        snapshot.forEach(child => {
+            const d = child.val();
+            const timeStr = d.timestamp ? new Date(d.timestamp).toLocaleString('vi-VN') : 'N/A';
+            const statusHtml = (d.status === "Bất thường")
+                ? `<span class="badge-status bg-alert"><i class="fas fa-skull-crossbones me-1"></i>BẤT THƯỜNG</span>`
+                : `<span class="badge-status bg-normal"><i class="fas fa-check-circle me-1"></i>ỔN ĐỊNH</span>`;
 
-        db.ref("/devices/" + currentId + "/profile").once('value')
-            .then((snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    document.getElementById('pName').value = data.name || "Nguyễn Văn A";
-                    document.getElementById('pAge').value = data.age || 45;
-                    document.getElementById('pBlood').value = data.blood || "O+";
-                    document.getElementById('pHistory').value = data.history || "Đang theo dõi rối loạn nhịp tim. Bệnh nhân có tiền sử tăng huyết áp vô căn.";
-                }
-            });
+            rows.push(`<tr>
+                <td>${timeStr}</td>
+                <td class="text-info">${currentId}</td>
+                <td class="fw-bold" style="color:var(--neon-hr)">${d.bpm}</td>
+                <td class="fw-bold" style="color:var(--neon-spo2)">${d.spo2}%</td>
+                <td>${statusHtml}</td>
+            </tr>`);
+        });
+        tableBody.innerHTML = rows.reverse().join('');
+    });
+}
+
+// Xóa lịch sử thật trên Firebase
+function clearHistory() {
+    if (confirm("Xóa toàn bộ lịch sử đo lường?")) {
+        db.ref(`/devices/${currentId}/measurements`).remove()
+            .then(() => document.getElementById('fullHistoryTable').innerHTML = '');
     }
+}
+    // ==================== AI TRÒ CHUYỆN THÔNG MINH ====================
+function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addChatMessage('user', msg);
+    input.value = '';
+
+    // Hiệu ứng đang suy nghĩ
+    const thinking = document.createElement('div');
+    thinking.className = 'd-flex justify-content-start';
+    thinking.innerHTML = `<div class="p-3 rounded-4" style="background:rgba(157,78,221,0.3); color:var(--neon-purple);"><i class="fas fa-spinner fa-spin me-2"></i>AI đang phân tích...</div>`;
+    document.getElementById('chatMessages').appendChild(thinking);
+    document.getElementById('chatMessages').scrollTop = 999999;
+
+    setTimeout(() => {
+        thinking.remove();
+        const reply = getSmartAIResponse(msg);
+        addChatMessage('ai', reply);
+    }, 1100);
+}
+
+function addChatMessage(sender, text) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = sender === 'user' ? 'd-flex justify-content-end' : 'd-flex justify-content-start';
+    div.innerHTML = `
+        <div class="p-3 rounded-4 ${sender==='user' ? 'chat-bubble-user' : 'chat-bubble-ai'}" style="max-width:78%;">
+            ${text}
+        </div>`;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function getSmartAIResponse(q) {
+    q = q.toLowerCase();
+    const bpm = currentBPM || 0;
+    const spo2 = currentSPO2 || 0;
+
+    if (q.includes("nhịp tim") || q.includes("bpm") || q.includes("tim")) {
+        return `Nhịp tim hiện tại của bạn là <strong>${bpm} BPM</strong>.<br>
+        ${bpm > 100 ? '⚠️ Nhịp nhanh – hãy nghỉ ngơi ngay!' : bpm < 60 ? 'Nhịp chậm, cần theo dõi thêm.' : 'Nhịp tim bình thường 👍'}`;
+    }
+    if (q.includes("spo2") || q.includes("oxy") || q.includes("bão hòa")) {
+        return `SpO₂ hiện tại là <strong>${spo2}%</strong>.<br>
+        ${spo2 < 94 ? '🚨 Thiếu oxy! Cần thở sâu hoặc đến bệnh viện.' : 'Mức oxy tốt ✅'}`;
+    }
+    if (q.includes("tình trạng") || q.includes("khỏe") || q.includes("chẩn đoán")) {
+        return `Theo AI Diagnostic Engine:<br>
+        • Nhịp tim: ${bpm} BPM<br>
+        • SpO₂: ${spo2}%<br>
+        Tình trạng hiện tại: ${bpm > 100 || spo2 < 94 ? 'Cần theo dõi khẩn' : 'Ổn định'}.`;
+    }
+    if (q.includes("ăn") || q.includes("thức ăn") || q.includes("dinh dưỡng")) {
+        return "Nên ăn: chuối, rau bina, cá hồi, yến mạch. Tránh muối, đồ chiên, cà phê nhiều.";
+    }
+    if (q.includes("tập") || q.includes("thể dục")) {
+        return "Tập nhẹ 30 phút/ngày (đi bộ). Tránh tập nặng nếu nhịp tim >100 BPM.";
+    }
+    if (q.includes("chào") || q.includes("hi") || q.includes("hello")) {
+        return "Chào bạn! Tôi là AI Trợ Lý Y Tế thông minh. Bạn đang lo lắng về chỉ số nào hôm nay?";
+    }
+    return `Cảm ơn câu hỏi!<br>Dữ liệu hiện tại: HR ${bpm} BPM | SpO₂ ${spo2}%.<br>Bạn muốn tôi tư vấn thêm về gì? 💡`;
+}
 </script>
 </body>
 </html>
