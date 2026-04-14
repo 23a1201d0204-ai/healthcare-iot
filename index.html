@@ -304,18 +304,6 @@
     <i class="fas fa-comments"></i> Tư vấn ngay
 </button>
 
-<!-- Khung Chat Tư Vấn -->
-<div id="chatBox" class="chat-box" style="display: none;">
-    <div class="chat-header">
-        <strong>🤖 Tư Vấn Viên AI - ĐỒ ÁN 2</strong>
-        <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:1.5rem;">×</button>
-    </div>
-    <div id="chatMessages" class="chat-messages"></div>
-    <div class="chat-input-area">
-        <input type="text" id="userInput" placeholder="Nhập câu hỏi của bạn..." onkeypress="if(event.key==='Enter') sendMessage()">
-        <button onclick="sendMessage()">Gửi</button>
-    </div>
-</div>
         /* Nút tư vấn nổi */
 .consult-btn {
     position: fixed;
@@ -395,17 +383,7 @@
     border-radius: 10px;
     font-weight: bold;
 }
-        <!-- Hotline & Zalo Floating -->
-<div class="contact-float">
-    <a href="tel:19001234" class="float-btn hotline-btn" title="Gọi Hotline">
-        <i class="fas fa-phone"></i>
-        <span>Hotline: 1900 1234</span>
-    </a>
-    <a href="https://zalo.me/0123456789" target="_blank" class="float-btn zalo-btn" title="Chat Zalo">
-        <i class="fab fa-zalo"></i>   <!-- Font Awesome có icon Zalo -->
-        <span>Zalo: 0123 456 789</span>
-    </a>
-</div>
+        
         /* Hotline & Zalo Floating */
 .contact-float {
     position: fixed;
@@ -446,7 +424,36 @@
     </style>
 </head>
 <body>
+<!-- Nút Tư Vấn Nổi -->
+<button onclick="toggleChat()" class="consult-btn">
+    <i class="fas fa-comments"></i> Tư vấn ngay
+</button>
 
+<!-- Khung Chat Tư Vấn -->
+<div id="chatBox" class="chat-box" style="display: none;">
+    <div class="chat-header">
+        <strong>🤖 Tư Vấn Viên AI - ĐỒ ÁN 2</strong>
+        <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:1.5rem;">×</button>
+    </div>
+    <div id="chatMessages" class="chat-messages"></div>
+    <div class="chat-input-area">
+        <input type="text" id="userInput" placeholder="Nhập câu hỏi của bạn..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Gửi</button>
+    </div>
+</div>
+    
+<!-- Hotline & Zalo Floating -->
+<div class="contact-float">
+    <a href="tel:19001234" class="float-btn hotline-btn" title="Gọi Hotline">
+        <i class="fas fa-phone"></i>
+        <span>Hotline: 1900 1234</span>
+    </a>
+    <a href="https://zalo.me/0123456789" target="_blank" class="float-btn zalo-btn" title="Chat Zalo">
+        <i class="fab fa-zalo"></i>   <!-- Font Awesome có icon Zalo -->
+        <span>Zalo: 0123 456 789</span>
+    </a>
+</div>
+    
 <div id="splash-screen">
     <div class="ecg-loader">
         <svg viewBox="0 0 250 100" xmlns="http://www.w3.org/2000/svg">
