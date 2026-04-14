@@ -340,6 +340,7 @@
         <div class="nav-link" onclick="switchMenu('history', this)"><i class="fas fa-chart-gantt nav-icon"></i> <span class="nav-text">Lịch Sử Đo Lường</span></div>
         <div class="nav-link" onclick="switchMenu('alerts', this)"><i class="fas fa-triangle-exclamation nav-icon"></i> <span class="nav-text">Nhật Ký Cảnh Báo</span></div>
         <div class="nav-link" onclick="switchMenu('news', this)"><i class="fas fa-newspaper nav-icon"></i> <span class="nav-text">Tin Tức Y Tế</span></div>
+        <div class="nav-link" onclick="switchMenu('appointments', this)"><i class="fas fa-calendar-plus nav-icon"></i> <span class="nav-text">Đặt Lịch Khám</span></div>
         <div class="nav-link mt-4 border-top pt-4" style="border-color: var(--border-color)!important" onclick="switchMenu('settings', this)"><i class="fas fa-cog nav-icon" style="color: var(--text-secondary)"></i> <span class="nav-text">Cài đặt Hệ thống</span></div>
     </div>
 </div>
@@ -361,6 +362,7 @@
                 <i class="fas fa-circle-notch fa-spin me-2" id="statusDot"></i> <span id="statusText">Chưa xác thực</span>
             </div>
             <div class="text-secondary small">WSS Server: <span class="text-success fw-bold" style="text-shadow: 0 0 5px var(--neon-success);">ONLINE</span></div>
+            
         </div>
     </div>
 
@@ -644,7 +646,85 @@
             </div>
         </div>
     </div>
+    <!-- ==================== TAB ĐẶT LỊCH KHÁM - THÊM VÀO ĐÂY ==================== -->
+    <div id="appointments" class="tab-pane">
+        <div class="card-stat">
+            <h4 class="fw-bold mb-4">
+                <i class="fas fa-calendar-check me-2" style="color: var(--neon-spo2);"></i>
+                Đặt Lịch Khám Bệnh
+            </h4>
+            
+            <!-- Form đặt lịch -->
+            <form id="appointmentForm" onsubmit="saveAppointment(event)">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Họ và tên bệnh nhân</label>
+                        <input type="text" class="form-control form-control-neon" id="appName" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tuổi</label>
+                        <input type="number" class="form-control form-control-neon" id="appAge">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Giới tính</label>
+                        <select class="form-select form-control-neon" id="appGender">
+                            <option value="">Chọn</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="tel" class="form-control form-control-neon" id="appPhone" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Ngày khám</label>
+                        <input type="date" class="form-control form-control-neon" id="appDate" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Giờ khám</label>
+                        <input type="time" class="form-control form-control-neon" id="appTime" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Lý do khám</label>
+                        <input type="text" class="form-control form-control-neon" id="appReason" 
+                               placeholder="Ví dụ: Khám tim mạch định kỳ, kiểm tra SpO2..." required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Ghi chú thêm</label>
+                        <textarea class="form-control form-control-neon" rows="3" id="appNote" 
+                                  placeholder="Ghi chú cho bác sĩ..."></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-outline-info px-5 py-2">
+                            <i class="fas fa-calendar-plus me-2"></i> ĐẶT LỊCH KHÁM
+                        </button>
+                    </div>
+                </div>
+            </form>
 
+            <hr class="my-5">
+
+            <!-- Danh sách lịch đã đặt -->
+            <h5 class="fw-bold mb-3">Danh sách lịch khám đã đặt</h5>
+            <div class="table-responsive" style="max-height: 420px; overflow-y: auto;">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th>Ngày Giờ</th>
+                            <th>Bệnh nhân</th>
+                            <th>Lý do khám</th>
+                            <th>Ghi chú</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- ==================== KẾT THÚC TAB ĐẶT LỊCH KHÁM ==================== -->
 </div>
 
 <script>
@@ -665,8 +745,12 @@
 
         document.querySelectorAll('.tab-pane').forEach(el => {
             el.classList.remove('active');
+            // Load dữ liệu khi chuyển tab
+if (tabId === 'patient') loadPatientProfile();
+if (tabId === 'appointments') loadAppointments();
             el.style.animation = 'none'; 
             el.offsetHeight; 
+            
         });
         
         const targetTab = document.getElementById(tabId);
@@ -966,49 +1050,105 @@
 
         }, 4500); // Loading kéo dài 4.5 giây - rất giống phim khoa học viễn tưởng
     }
-        // ====================== SỬA PHẦN HỒ SƠ - LƯU THẬT VÀO FIREBASE ======================
-    function savePatientProfile(e) {
-        e.preventDefault();
-
-        if (!currentId) {
-            alert("Vui lòng đăng nhập thiết bị trước!");
-            return;
-        }
-
-        const profileData = {
-            name: document.getElementById('pName').value.trim(),
-            age: parseInt(document.getElementById('pAge').value) || 0,
-            blood: document.getElementById('pBlood').value,
-            history: document.getElementById('pHistory').value.trim()
-        };
-
-        // Lưu vào Firebase
-        db.ref("/devices/" + currentId + "/profile").set(profileData)
-            .then(() => {
-                const status = document.getElementById('saveStatus');
-                status.style.display = 'inline-block';
-                setTimeout(() => { status.style.display = 'none'; }, 3000);
-            })
-            .catch((error) => {
-                alert("Lưu thất bại: " + error.message);
-            });
+        // ====================== HỒ SƠ BỆNH NHÂN - SỬA LỖI LOAD LẠI ======================
+function savePatientProfile(e) {
+    e.preventDefault();
+    if (!currentId) {
+        alert("Vui lòng kết nối thiết bị trước!");
+        return;
     }
 
-    // Load hồ sơ khi đăng nhập
-    function loadPatientProfile() {
-        if (!currentId) return;
+    const profileData = {
+        name: document.getElementById('pName').value.trim(),
+        age: parseInt(document.getElementById('pAge').value) || 0,
+        gender: document.getElementById('pGender').value,
+        blood: document.getElementById('pBlood').value,
+        phone: document.getElementById('pPhone').value.trim(),
+        startDate: document.getElementById('pStartDate').value,
+        address: document.getElementById('pAddress').value.trim(),
+        history: document.getElementById('pHistory').value.trim()
+    };
 
-        db.ref("/devices/" + currentId + "/profile").once('value')
-            .then((snapshot) => {
-                const data = snapshot.val();
-                if (data) {
-                    document.getElementById('pName').value = data.name || "Nguyễn Văn A";
-                    document.getElementById('pAge').value = data.age || 45;
-                    document.getElementById('pBlood').value = data.blood || "O+";
-                    document.getElementById('pHistory').value = data.history || "Đang theo dõi rối loạn nhịp tim. Bệnh nhân có tiền sử tăng huyết áp vô căn.";
-                }
-            });
+    db.ref("/devices/" + currentId + "/profile").set(profileData)
+        .then(() => {
+            const status = document.getElementById('saveStatus');
+            status.style.display = 'inline-block';
+            setTimeout(() => { status.style.display = 'none'; }, 3000);
+        })
+        .catch(err => alert("Lưu thất bại: " + err.message));
+}
+   function loadPatientProfile() {
+    if (!currentId) return;
+    db.ref("/devices/" + currentId + "/profile").once('value')
+        .then(snapshot => {
+            const data = snapshot.val() || {};
+            document.getElementById('pName').value = data.name || "";
+            document.getElementById('pAge').value = data.age || "";
+            document.getElementById('pGender').value = data.gender || "";
+            document.getElementById('pBlood').value = data.blood || "";
+            document.getElementById('pPhone').value = data.phone || "";
+            document.getElementById('pStartDate').value = data.startDate || "";
+            document.getElementById('pAddress').value = data.address || "";
+            document.getElementById('pHistory').value = data.history || "";
+        });
+}
+    // ====================== ĐẶT LỊCH KHÁM ======================
+function saveAppointment(e) {
+    e.preventDefault();
+    if (!currentId) {
+        alert("Vui lòng kết nối thiết bị trước!");
+        return;
     }
+
+    const appointment = {
+        name: document.getElementById('appName').value.trim(),
+        age: parseInt(document.getElementById('appAge').value) || 0,
+        gender: document.getElementById('appGender').value,
+        phone: document.getElementById('appPhone').value.trim(),
+        date: document.getElementById('appDate').value,
+        time: document.getElementById('appTime').value,
+        reason: document.getElementById('appReason').value.trim(),
+        note: document.getElementById('appNote').value.trim(),
+        createdAt: new Date().toISOString()
+    };
+
+    db.ref("/devices/" + currentId + "/appointments").push(appointment)
+        .then(() => {
+            alert("Đặt lịch thành công!");
+            document.getElementById('appointmentForm').reset();
+            loadAppointments();
+        })
+        .catch(err => alert("Lỗi: " + err.message));
+}
+
+function loadAppointments() {
+    if (!currentId) return;
+    const list = document.getElementById('appointmentList');
+    list.innerHTML = "";
+
+    db.ref("/devices/" + currentId + "/appointments").once('value')
+        .then(snapshot => {
+            snapshot.forEach(child => {
+                const app = child.val();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${app.date} ${app.time}</td>
+                    <td>${app.name} (${app.age} tuổi)</td>
+                    <td>${app.reason}</td>
+                    <td>${app.note || '-'}</td>
+                    <td><button class="btn btn-sm btn-outline-danger" onclick="deleteAppointment('${child.key}')">Xóa</button></td>
+                `;
+                list.appendChild(row);
+            });
+        });
+}
+
+function deleteAppointment(key) {
+    if (confirm("Xóa lịch này?")) {
+        db.ref("/devices/" + currentId + "/appointments/" + key).remove()
+            .then(() => loadAppointments());
+    }
+}
 </script>
 </body>
 </html>
