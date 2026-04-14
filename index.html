@@ -395,6 +395,54 @@
     border-radius: 10px;
     font-weight: bold;
 }
+        <!-- Hotline & Zalo Floating -->
+<div class="contact-float">
+    <a href="tel:19001234" class="float-btn hotline-btn" title="Gọi Hotline">
+        <i class="fas fa-phone"></i>
+        <span>Hotline: 1900 1234</span>
+    </a>
+    <a href="https://zalo.me/0123456789" target="_blank" class="float-btn zalo-btn" title="Chat Zalo">
+        <i class="fab fa-zalo"></i>   <!-- Font Awesome có icon Zalo -->
+        <span>Zalo: 0123 456 789</span>
+    </a>
+</div>
+        /* Hotline & Zalo Floating */
+.contact-float {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 9998;
+}
+
+.float-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #111827;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.float-btn:hover {
+    transform: translateX(-8px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+}
+
+.hotline-btn:hover { background: #ef4444; }
+.zalo-btn:hover { background: #0068ff; }
+
+.float-btn i {
+    font-size: 1.3rem;
+}
     </style>
 </head>
 <body>
