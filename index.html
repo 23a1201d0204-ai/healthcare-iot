@@ -14,26 +14,25 @@
     <style>
         /* BẢNG MÀU DARK NEON */
         :root { 
-            --bg-body: #08080c;        
-            --bg-sidebar: #101016;     
-            --bg-card: #14141d;        
-            --text-primary: #f8fafc;   
-            --text-secondary: #8b9bb4; 
-            --border-color: #232332;   
-            
-            --neon-hr: #ff2a5f;        
-            --neon-spo2: #00e5ff;      
-            --neon-success: #00ff88;   
-            --neon-warning: #ffb703;   
+            --bg-body: #08080c;
+            --bg-sidebar: #101016;
+            --bg-card: #14141d;
+            --text-primary: #f8fafc;
+            --text-secondary: #8b9bb4;
+            --border-color: #232332;
+           
+            --neon-hr: #ff2a5f;
+            --neon-spo2: #00e5ff;
+            --neon-success: #00ff88;
+            --neon-warning: #ffb703;
             --neon-purple: #9d4edd;
-            
+           
             --glow-hr: 0 0 20px rgba(255, 42, 95, 0.4);
             --glow-spo2: 0 0 20px rgba(0, 229, 255, 0.4);
             --glow-success: 0 0 20px rgba(0, 255, 136, 0.3);
-            
+           
             --smooth-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-
         body { 
             background-color: var(--bg-body); 
             color: var(--text-primary);
@@ -102,6 +101,11 @@
             box-shadow: 0 0 55px rgba(0, 229, 255, 0.6);
             transform: translateY(-6px);
         }
+        .login-card {
+            padding: 30px 20px;
+            width: 92%;
+            max-width: 380px;
+        }
         .fingerprint-icon {
             animation: fingerprintPulse 2s ease-in-out infinite;
         }
@@ -146,6 +150,23 @@
         
         .toggle-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; font-size: 1.5rem; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; border-radius: 10px; transition: 0.3s; }
         .toggle-btn:hover { color: var(--neon-spo2); background: rgba(0,229,255,0.1); text-shadow: var(--glow-spo2); }
+        .sidebar {
+            width: 280px;
+            transform: translateX(0);
+        }
+        @media (max-width: 991px) {
+            .sidebar {
+                width: 260px;
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 15px 12px;
+            }
+        }
         
         /* HIỆU ỨNG NAV LINK */
         .nav-link { color: var(--text-secondary); padding: 18px 20px; font-size: 1.05rem; border-left: 4px solid transparent; transition: all 0.4s var(--smooth-ease); cursor: pointer; display: flex; align-items: center; white-space: nowrap; position: relative; overflow: hidden; z-index: 1;}
@@ -168,7 +189,17 @@
         .card-stat::after { content: ''; position: absolute; inset: 0; border-radius: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.4); opacity: 0; transition: 0.4s var(--smooth-ease); z-index: -1; }
         .card-stat:hover { transform: translateY(-8px); border-color: rgba(255,255,255,0.15); }
         .card-stat:hover::after { opacity: 1; }
-        
+        .card-stat {
+            padding: 18px 16px;
+            margin-bottom: 18px;
+        }
+        #bpmChart, #spo2Chart {
+            height: 170px !important;
+        }
+        @media (min-width: 992px) {
+            .card-stat { padding: 25px; }
+            #bpmChart, #spo2Chart { height: 200px !important; }
+        }
         .card-hr:hover { border-color: rgba(255, 42, 95, 0.3); box-shadow: 0 15px 35px rgba(255, 42, 95, 0.15); }
         .card-spo2:hover { border-color: rgba(0, 229, 255, 0.3); box-shadow: 0 15px 35px rgba(0, 229, 255, 0.15); }
 
@@ -178,13 +209,28 @@
         .val-hr { color: var(--neon-hr); text-shadow: var(--glow-hr); }
         .val-spo2 { color: var(--neon-spo2); text-shadow: var(--glow-spo2); }
         .value-unit { font-size: 1.5rem; font-weight: normal; color: var(--text-secondary); text-shadow: none; margin-left: 8px; letter-spacing: 0; }
+        .value-display {
+            font-size: clamp(2.8rem, 9vw, 4.8rem); /* Giảm mạnh trên mobile */
+            font-weight: 900;
+            line-height: 1.05;
+            margin: 8px 0;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: -1.5px;
+        }
         
         /* BẢNG CHUYÊN NGHIỆP */
         .table-custom { color: var(--text-primary); width: 100%; margin: 0; border-collapse: separate; border-spacing: 0; }
         .table-custom th { color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-color); padding: 18px 15px; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; }
         .table-custom td { padding: 18px 15px; border-bottom: 1px solid rgba(255,255,255,0.02); vertical-align: middle; font-size: 1.05rem; transition: background 0.3s; }
         .table-custom tbody tr:hover td { background: rgba(255,255,255,0.03); }
-
+.table-custom th, .table-custom td {
+            padding: 12px 8px;
+            font-size: 0.95rem;
+        }
+        .form-control-neon, .form-select-neon {
+            font-size: 1rem;
+            padding: 12px 14px;
+        }
         .badge-status { padding: 8px 14px; border-radius: 10px; font-weight: bold; font-size: 0.85rem; letter-spacing: 0.5px; display: inline-flex; align-items: center; }
         .bg-normal { background: rgba(0, 255, 136, 0.1); color: var(--neon-success); border: 1px solid rgba(0, 255, 136, 0.3); box-shadow: inset 0 0 10px rgba(0,255,136,0.1); }
         .bg-alert { background: rgba(255, 42, 95, 0.1); color: var(--neon-hr); border: 1px solid rgba(255, 42, 95, 0.3); box-shadow: inset 0 0 10px rgba(255,42,95,0.1); animation: pulseAlert 2s infinite; }
@@ -196,7 +242,11 @@
 
         .patient-header { background: linear-gradient(120deg, var(--bg-card), #12121a); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px 30px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; overflow: hidden; }
         .patient-header::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--neon-spo2); box-shadow: var(--glow-spo2); }
-        
+        .patient-header {
+            padding: 16px 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
         .heart-beat { animation: pumpSmooth 1s var(--smooth-ease) infinite; color: var(--neon-hr); filter: drop-shadow(0 0 10px rgba(255,42,95,0.6)); }
         @keyframes pumpSmooth { 0% { transform: scale(1); } 15% { transform: scale(1.25); } 30% { transform: scale(1); } 45% { transform: scale(1.15); } 60% { transform: scale(1); } }
 
